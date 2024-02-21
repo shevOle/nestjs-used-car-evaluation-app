@@ -9,7 +9,7 @@ export class AuthController {
     @Post()
     async createUser(@Body() body: CreateUserDto) {
         try {
-            await this.authService.createUser(body);
+            await this.authService.createUser(body.email, body.password);
             return { status: 'ok' };
         } catch (err) {
             if (err instanceof HttpException) throw err;
