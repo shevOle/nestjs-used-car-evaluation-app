@@ -6,10 +6,11 @@ import { CreateUserDto } from './dtos/create-user.dto';
 export class AuthController {
     constructor(private authService: AuthService) {}
 
-    @Post()
-    async createUser(@Body() body: CreateUserDto) {
+    @Post('/signup')
+    async signupUser(@Body() body: CreateUserDto) {
         try {
-            await this.authService.createUser(body.email, body.password);
+            const user = await this.authService.singup(body.email, body.password);
+            console.log(user)
             return { status: 'ok' };
         } catch (err) {
             if (err instanceof HttpException) throw err;
