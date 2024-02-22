@@ -1,4 +1,15 @@
-import { Controller, Get, Patch, Body, Delete, Query, Param, BadRequestException } from '@nestjs/common';
+import { 
+    Controller, 
+    Get, 
+    Patch, 
+    Delete, 
+    Body, 
+    Query, 
+    Param,
+    Response,
+    BadRequestException,
+ } from '@nestjs/common';
+import { Response as IRespone } from 'express';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { PublicUserDto } from './dtos/public-user.dto';
@@ -22,17 +33,22 @@ export class UsersController {
     }
 
     @Patch('/:id')
-    updateUser(
+    async updateUser(
         @Param('id') id: string,
         @Body() body: UpdateUserDto,
+        @Response() res: IRespone,
     ) {
         if (!parseInt(id) && id !== '0') throw new BadRequestException('Id must be a number');
-        return this.userService.update(parseInt(id), body);
+        await this.userService.update(parseInt(id), body);
+        
+        return res.sendStatus(200);
     }
 
     @Delete('/:id')
-    removeUser(@Param('id') id: string) {
+    async removeUser(@Param('id') id: string, @Response() res: IRespone,) {
         if (!parseInt(id) && id !== '0') throw new BadRequestException('Id must be a number');
-        return this.userService.remove(parseInt(id));
+        await this.userService.remove(parseInt(id));
+
+        return res.sendStatus(204);
     }
 }
