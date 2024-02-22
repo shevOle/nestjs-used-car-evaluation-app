@@ -22,8 +22,7 @@ export class UsersController {
 
     @Get()
     findUsers(@Query('email') email: string) {
-        if (email) return this.userService.findByEmail(email);
-        return this.userService.findAll();
+        return this.userService.find(email);
     }
 
     @Get('/:id')
@@ -40,7 +39,7 @@ export class UsersController {
     ) {
         if (!parseInt(id) && id !== '0') throw new BadRequestException('Id must be a number');
         await this.userService.update(parseInt(id), body);
-        
+
         return res.sendStatus(200);
     }
 
