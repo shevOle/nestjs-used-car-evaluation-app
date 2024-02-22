@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { createHash } from 'crypto';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -11,9 +12,7 @@ export class AuthService {
             throw new BadRequestException('This email is already in use');
         }
 
-        // add password hashing
-        const hashedPassword = password;
-
+        const hashedPassword = createHash('md5').update(password).digest('hex')
         return this.userService.createUser(email, hashedPassword);
     }
 
