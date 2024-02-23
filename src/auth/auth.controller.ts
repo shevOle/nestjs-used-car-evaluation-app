@@ -3,7 +3,9 @@ import { Response as IResponse } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
+import { CurrentUser } from '../decorators/current-user.decorator';
 import { PublicUserDto } from '../users/dtos/public-user.dto';
+import { User } from '../users/user.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 
 @Controller('auth')
@@ -12,9 +14,8 @@ export class AuthController {
 
     @Serialize(PublicUserDto)
     @Get('/whoami')
-    whoAmI(@Session() session: any) {
-        console.log(session.userId)
-        return this.authService.whoAmI(session.userId);
+    whoAmI(@CurrentUser() user: User) {
+        return user;
     }
 
     @Post('/signup')
