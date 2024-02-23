@@ -1,4 +1,5 @@
-import { Controller, Post, Body, InternalServerErrorException, HttpException } from '@nestjs/common';
+import { Controller, Post, Body, InternalServerErrorException, HttpException, Response } from '@nestjs/common';
+import { Response as IResponse } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 
@@ -7,11 +8,13 @@ export class AuthController {
     constructor(private authService: AuthService) {}
 
     @Post('/signup')
-    async signupUser(@Body() body: CreateUserDto) {
+    async signupUser(
+        @Body() body: CreateUserDto,
+        @Response() res: IResponse,    
+    ) {
         try {
             const user = await this.authService.singup(body.email, body.password);
-            console.log(user)
-            return { status: 'ok' };
+            return res.sendStatus(201);
         } catch (err) {
             if (err instanceof HttpException) throw err;
             throw new InternalServerErrorException('Something went wrong');
