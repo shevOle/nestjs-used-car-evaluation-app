@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, InternalServerErrorException, HttpException, Response, Session } from '@nestjs/common';
+import { 
+    Controller, 
+    Get, 
+    Post, 
+    Body, 
+    Response, 
+    Session,
+    HttpException, 
+    InternalServerErrorException, 
+    UseGuards,
+ } from '@nestjs/common';
 import { Response as IResponse } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -7,12 +17,14 @@ import { CurrentUser } from '../decorators/current-user.decorator';
 import { PublicUserDto } from '../users/dtos/public-user.dto';
 import { User } from '../users/user.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
+import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
     @Serialize(PublicUserDto)
+    @UseGuards(AuthGuard)
     @Get('/whoami')
     whoAmI(@CurrentUser() user: User) {
         return user;
@@ -45,6 +57,7 @@ export class AuthController {
         return res.sendStatus(200);
     }
 
+    @UseGuards(AuthGuard)
     @Post('/logout')
     logOut(@Session() session: any, @Response() res: IResponse, ) {
         session.userId = null;

@@ -8,13 +8,16 @@ import {
     Param,
     Response,
     BadRequestException,
+    UseGuards,
  } from '@nestjs/common';
 import { Response as IRespone } from 'express';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { PublicUserDto } from './dtos/public-user.dto';
 import { Serialize } from '../interceptors/serialize.interceptor';
+import { AuthGuard } from '../guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Serialize(PublicUserDto)
 @Controller('users')
 export class UsersController {
