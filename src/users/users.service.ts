@@ -10,12 +10,14 @@ export class UsersService {
     ) {}
 
     async findById(id: number): Promise<User> {
+        if (!id) return null;
         const user = await this.userRepository.findOneBy({ id });
         if (!user) throw new NotFoundException('User not found');
         return user;
     }
 
     findbyEmail(email: string): Promise<User> {
+        if (!email) return null;
         return this.userRepository.findOne({ where: { email } });
     }
 
@@ -34,6 +36,7 @@ export class UsersService {
     }
 
     async update(id: number, update: Partial<User>) {
+        if (!id) throw new BadRequestException('User Id is needed');
         const originalUser = await this.findById(id);
         const newUser = this.userRepository.create({ ...originalUser, ...update });
 
@@ -41,6 +44,7 @@ export class UsersService {
     }
 
     async remove(id: number) {
+        if (!id) throw new BadRequestException('User Id is needed');
         const user = await this.findById(id);
         return this.userRepository.remove(user);
     }
