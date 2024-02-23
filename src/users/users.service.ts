@@ -15,14 +15,17 @@ export class UsersService {
         return user;
     }
 
-    find(email?: string): Promise<User[]> {
-        const query = email ? { where: { email } } : {};
-        return this.userRepository.find(query);
+    findbyEmail(email: string): Promise<User> {
+        return this.userRepository.findOne({ where: { email } });
+    }
+
+    findAll(): Promise<User[]> {
+        return this.userRepository.find();
     }
 
     async createUser(email: string, password: string) {
-        const existingUsers = await this.find(email);
-        if (existingUsers.length) {
+        const existingUser = await this.findbyEmail(email);
+        if (existingUser) {
             throw new BadRequestException('User with this email already exists');
         }
 
