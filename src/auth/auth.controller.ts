@@ -44,4 +44,10 @@ export class AuthController {
         session.userId = user.id;
         return res.sendStatus(200);
     }
+
+    @Post('/logout')
+    logOut(@Session() session: any, @Response() res: IResponse, ) {
+        session.userId = null;
+        return res.sendStatus(200);
+    }
 }
