@@ -1,6 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { createHash } from 'crypto';
+import { scrypt } from 'crypto';
+import { promisify } from 'util';
 import { UsersService } from '../users/users.service';
+
+const scryptPromise = promisify(scrypt);
 
 @Injectable()
 export class AuthService {
@@ -12,8 +15,8 @@ export class AuthService {
             throw new BadRequestException('This email is already in use');
         }
 
-        const hashedPassword = createHash('md5').update(password).digest('hex')
-        return this.userService.createUser(email, hashedPassword);
+        const hashedPassword = (await scryptPromise(password, process.env.SECRET, 24)) as Buffer;
+        return this.userService.createUser(email, hashedPassword.toString());
     }
 
     login() {}
