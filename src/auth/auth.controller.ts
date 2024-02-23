@@ -1,20 +1,31 @@
-import { Controller, Post, Body, InternalServerErrorException, HttpException, Response } from '@nestjs/common';
+import { Controller, Get, Post, Body, InternalServerErrorException, HttpException, Response, Session } from '@nestjs/common';
 import { Response as IResponse } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
+import { PublicUserDto } from '../users/dtos/public-user.dto';
+import { Serialize } from '../interceptors/serialize.interceptor';
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
+    @Serialize(PublicUserDto)
+    @Get('/whoami')
+    whoAmI(@Session() session: any) {
+        console.log(session.userId)
+        return this.authService.whoAmI(session.userId);
+    }
+
     @Post('/signup')
     async signupUser(
         @Body() body: CreateUserDto,
-        @Response() res: IResponse,    
+        @Response() res: IResponse,   
+        @Session() session: any, 
     ) {
         try {
             const user = await this.authService.singup(body.email, body.password);
+            session.userId = user.id;
             return res.sendStatus(201);
         } catch (err) {
             if (err instanceof HttpException) throw err;
@@ -25,9 +36,11 @@ export class AuthController {
     @Post('/login')
     async loginUser(
         @Body() body: LoginUserDto,
-        @Response() res: IResponse,    
+        @Response() res: IResponse,
+        @Session() session: any,
     ) {
         const user = await this.authService.login(body.email, body.password);
+        session.userId = user.id;
         return res.sendStatus(200);
     }
 }

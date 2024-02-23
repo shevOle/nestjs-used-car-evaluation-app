@@ -35,4 +35,8 @@ export class AuthService {
 
         return user;
     }
+
+    async whoAmI(id: number) {
+        return this.userService.findById(id);
+    }
 }
