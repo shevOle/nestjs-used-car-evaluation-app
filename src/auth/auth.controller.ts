@@ -2,6 +2,7 @@ import { Controller, Post, Body, InternalServerErrorException, HttpException, Re
 import { Response as IResponse } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { LoginUserDto } from './dtos/login-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -19,5 +20,14 @@ export class AuthController {
             if (err instanceof HttpException) throw err;
             throw new InternalServerErrorException('Something went wrong');
         }
+    }
+
+    @Post('/login')
+    async loginUser(
+        @Body() body: LoginUserDto,
+        @Response() res: IResponse,    
+    ) {
+        const user = await this.authService.login(body.email, body.password);
+        return res.sendStatus(200);
     }
 }
