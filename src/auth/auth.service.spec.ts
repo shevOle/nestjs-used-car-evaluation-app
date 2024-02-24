@@ -4,8 +4,8 @@ import { UsersService } from '../users/users.service';
 
 describe('AuthService', () => {
   let service: AuthService;
-  const fakeUserService = {
-    findByEmail: (email: string) => Promise.resolve(),
+  const fakeUserService: Partial<UsersService> = {
+    findByEmail: (email: string) => Promise.resolve({ id: 1, email, password: 'kasnf' }),
     createUser: (email: string, password: string) => Promise.resolve({ id: 1, email, password }),
   }
 
