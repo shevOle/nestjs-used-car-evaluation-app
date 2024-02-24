@@ -25,7 +25,7 @@ export class UsersController {
 
     @Get()
     findUsers(@Query('email') email: string) {
-        if (email) return this.userService.findbyEmail(email);
+        if (email) return this.userService.findByEmail(email);
         return this.userService.findAll();
     }
 

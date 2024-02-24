@@ -15,7 +15,7 @@ export class AuthService {
     }
 
     async singup(email: string, password: string) {
-        const existingUser = await this.userService.findbyEmail(email);
+        const existingUser = await this.userService.findByEmail(email);
         if (existingUser) {
             throw new BadRequestException('This email is already in use');
         }
@@ -25,7 +25,7 @@ export class AuthService {
     }
 
     async login(email: string, password: string) {
-        const user = await this.userService.findbyEmail(email);
+        const user = await this.userService.findByEmail(email);
 
         if (!user) throw new BadRequestException('Username or password is incorrect');
 
