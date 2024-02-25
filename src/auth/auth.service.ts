@@ -9,7 +9,7 @@ const scryptPromise = promisify(scrypt);
 export class AuthService {
     constructor(private userService: UsersService) {}
 
-    private async hashPassword(password: string): Promise<string> {
+    async hashPassword(password: string): Promise<string> {
         const hashedPassword = (await scryptPromise(password, process.env.SECRET, 24)) as Buffer;
         return hashedPassword.toString('hex');
     }
