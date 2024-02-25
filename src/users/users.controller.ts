@@ -24,15 +24,18 @@ export class UsersController {
     constructor(private userService: UsersService) {}
 
     @Get()
-    findUsers(@Query('email') email: string) {
+    findUsers(@Query('email') email?: string) {
         if (email) return this.userService.findByEmail(email);
         return this.userService.findAll();
     }
 
     @Get('/:id')
     findUserById(@Param('id') id: string) {
-        if (!parseInt(id) && id !== '0') throw new BadRequestException('Id must be a number');
-        return this.userService.findById(parseInt(id));
+        const parsedId = parseInt(id);
+        if (!parsedId || parsedId < 1) {
+            throw new BadRequestException('Id must be a positive number');
+        }
+        return this.userService.findById(parsedId);
     }
 
     @Patch('/:id')
@@ -41,16 +44,22 @@ export class UsersController {
         @Body() body: UpdateUserDto,
         @Response() res: IRespone,
     ) {
-        if (!parseInt(id) && id !== '0') throw new BadRequestException('Id must be a number');
-        await this.userService.update(parseInt(id), body);
+        const parsedId = parseInt(id);
+        if (!parsedId || parsedId < 1) {
+            throw new BadRequestException('Id must be a positive number');
+        }
+        await this.userService.update(parsedId, body);
 
         return res.sendStatus(200);
     }
 
     @Delete('/:id')
     async removeUser(@Param('id') id: string, @Response() res: IRespone,) {
-        if (!parseInt(id) && id !== '0') throw new BadRequestException('Id must be a number');
-        await this.userService.remove(parseInt(id));
+        const parsedId = parseInt(id);
+        if (!parsedId || parsedId < 1) {
+            throw new BadRequestException('Id must be a positive number');
+        }
+        await this.userService.remove(parsedId);
 
         return res.sendStatus(204);
     }
