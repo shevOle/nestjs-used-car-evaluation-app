@@ -1,11 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { config } from 'dotenv';
 import { AuthService } from './auth.service';
 import { hashPassword } from './helpers/hashPassword.helper';
 import { UsersService } from '../users/users.service';
-
-config();
 
 describe('AuthService', () => {
   let service: AuthService;
