@@ -1,18 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { scrypt } from 'crypto';
-import { promisify } from 'util';
+import { hashPassword } from './helpers/hashPassword.helper';
 import { UsersService } from '../users/users.service';
-
-const scryptPromise = promisify(scrypt);
 
 @Injectable()
 export class AuthService {
     constructor(private userService: UsersService) {}
-
-    async hashPassword(password: string): Promise<string> {
-        const hashedPassword = (await scryptPromise(password, process.env.SECRET, 24)) as Buffer;
-        return hashedPassword.toString('hex');
-    }
 
     async singup(email: string, password: string) {
         const existingUser = await this.userService.findByEmail(email);
@@ -20,7 +12,7 @@ export class AuthService {
             throw new BadRequestException('This email is already in use');
         }
 
-        const hashedPassword = await this.hashPassword(password);
+        const hashedPassword = await hashPassword(password);
         return this.userService.createUser(email, hashedPassword);
     }
 
@@ -29,7 +21,7 @@ export class AuthService {
 
         if (!user) throw new BadRequestException('Username or password is incorrect');
 
-        const hashedPassword = await this.hashPassword(password);
+        const hashedPassword = await hashPassword(password);
         const isPasswordCorrect = hashedPassword === user.password;
         if (!isPasswordCorrect) throw new BadRequestException('Username or password is incorrect');
 

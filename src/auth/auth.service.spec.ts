@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { config } from 'dotenv';
 import { AuthService } from './auth.service';
+import { hashPassword } from './helpers/hashPassword.helper';
 import { UsersService } from '../users/users.service';
 
 config();
@@ -35,13 +36,6 @@ describe('AuthService', () => {
     expect(service).toBeDefined();
   });
 
-  it('[hashPassword], password hashing returns a valid hash', async () => {
-    const hash = await service.hashPassword(defaultPassword);
-
-    expect(hash).toBeDefined();
-    expect(hash).not.toBe(defaultPassword);
-  })
-
   it('[signup], email is already registered, throws an error', async () => {
     const expectedException = new BadRequestException('This email is already in use');
     await expect(service.singup(defaultEmail, defaultPassword)).rejects.toThrow(expectedException);
@@ -68,7 +62,7 @@ describe('AuthService', () => {
   })
 
   it('[login], data is correct, return a user', async () => {
-    const hashedPassword = await service.hashPassword(defaultPassword);
+    const hashedPassword = await hashPassword(defaultPassword);
     fakeUserService.findByEmail = async (email: string) => ({ id: 1, email, password: hashedPassword });
 
     const user = await service.login(defaultEmail, defaultPassword);
