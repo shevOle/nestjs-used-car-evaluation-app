@@ -39,48 +39,54 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('[signupUser], something went wrong, throws an error', async () => {
-    fakeAuthService.singup = (email: string, password: string) => Promise.reject('some reason');
-    const requestBody = { email: defaultEmail, password: defaultPassword };
-    const expectedException = new InternalServerErrorException('Something went wrong');
-
-    await expect(controller.signupUser(requestBody, {} as any, {})).rejects.toThrow(expectedException);
+  describe('signupUser', () => {
+    it('something went wrong, throws an error', async () => {
+      fakeAuthService.singup = (email: string, password: string) => Promise.reject('some reason');
+      const requestBody = { email: defaultEmail, password: defaultPassword };
+      const expectedException = new InternalServerErrorException('Something went wrong');
+  
+      await expect(controller.signupUser(requestBody, {} as any, {})).rejects.toThrow(expectedException);
+    })
+  
+    it('creates user and returns CREATED', async () => {
+      const responseObjectMock = {
+        sendStatus: jest.fn()
+      }
+      const requestBody = { email: defaultEmail, password: defaultPassword };
+      const session = { userId: 3333 };
+  
+      await controller.signupUser(requestBody, responseObjectMock as any, session);
+  
+      expect(session.userId).toBe(1);
+      expect(responseObjectMock.sendStatus).toHaveBeenCalledWith(201);
+    })
   })
 
-  it('[signupUser], creates user and returns CREATED', async () => {
-    const responseObjectMock = {
-      sendStatus: jest.fn()
-    }
-    const requestBody = { email: defaultEmail, password: defaultPassword };
-    const session = { userId: 3333 };
 
-    await controller.signupUser(requestBody, responseObjectMock as any, session);
-
-    expect(session.userId).toBe(1);
-    expect(responseObjectMock.sendStatus).toHaveBeenCalledWith(201);
+  describe('loginUser', () => {
+    it('creates user and returns OK', async () => {
+      const responseObjectMock = {
+        sendStatus: jest.fn()
+      }
+      const requestBody = { email: defaultEmail, password: defaultPassword };
+      const session = { userId: 3333 };
+  
+      await controller.loginUser(requestBody, responseObjectMock as any, session);
+  
+      expect(session.userId).toBe(1);
+      expect(responseObjectMock.sendStatus).toHaveBeenCalledWith(200);
+    })
   })
 
+  describe('logOut', () => {
+    it('removes userId from session object', () => {
+      const responseObjectMock = {
+        sendStatus: jest.fn()
+      }
+      const session = { userId: 3333 };
 
-  it('[loginUser], creates user and returns OK', async () => {
-    const responseObjectMock = {
-      sendStatus: jest.fn()
-    }
-    const requestBody = { email: defaultEmail, password: defaultPassword };
-    const session = { userId: 3333 };
-
-    await controller.loginUser(requestBody, responseObjectMock as any, session);
-
-    expect(session.userId).toBe(1);
-    expect(responseObjectMock.sendStatus).toHaveBeenCalledWith(200);
-  })
-
-  it('[logOut], removes userId from session object', () => {
-    const responseObjectMock = {
-      sendStatus: jest.fn()
-    }
-    const session = { userId: 3333 };
-
-    controller.logOut(session, responseObjectMock as any);
-    expect(session.userId).toBeNull();
+      controller.logOut(session, responseObjectMock as any);
+      expect(session.userId).toBeNull();
+    })
   })
 });

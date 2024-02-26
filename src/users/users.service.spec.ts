@@ -39,95 +39,106 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
-  it('[findById], invalid number as Id passed, returns null', async () => {
-    const user = await service.findById(NaN);
-    expect(user).toBeNull();
+  describe('findById', () => {
+    it('invalid number as Id passed, returns null', async () => {
+      const user = await service.findById(NaN);
+      expect(user).toBeNull();
+    })
+  
+    it('user is not found, throws an error', async () => {
+      repository.findOneBy = jest.fn().mockResolvedValueOnce(null);
+      const expectedException = new NotFoundException('User not found');
+  
+      await expect(service.findById(1)).rejects.toThrow(expectedException);
+    })
+  
+    it('user returned', async () => {
+      const user = await service.findById(1);
+  
+      expect(user).toBeDefined();
+      expect(user.email).toBe(defaultEmail);
+      expect(user.password).toBe(defaultPassword);
+      expect(user.id).toBe(1);
+    })
   })
 
-  it('[findById], user is not found, throws an error', async () => {
-    repository.findOneBy = jest.fn().mockResolvedValueOnce(null);
-    const expectedException = new NotFoundException('User not found');
-
-    await expect(service.findById(1)).rejects.toThrow(expectedException);
+  describe('findByEmail', () => {
+    it('email is empty string, returns null', async () => {
+      const user = await service.findByEmail('');
+  
+      expect(user).toBeNull();
+    })
+  
+    it('valid email passed, returns user', async () => {
+      const user = await service.findByEmail(defaultEmail);
+  
+      expect(user).toBeDefined();
+      expect(user.email).toBe(defaultEmail);
+      expect(user.password).toBe(defaultPassword);
+      expect(user.id).toBe(1);
+    })
   })
 
-  it('[findById], user returned', async () => {
-    const user = await service.findById(1);
+  describe('findAll', () => {
+    it('returns couple of users', async () => {
+      repository.find = jest.fn().mockResolvedValueOnce(Array(3).map(defaultUserFunc));
+      const users = await service.findAll();
 
-    expect(user).toBeDefined();
-    expect(user.email).toBe(defaultEmail);
-    expect(user.password).toBe(defaultPassword);
-    expect(user.id).toBe(1);
+      expect(users).toHaveLength(3);
+    })
   })
 
-  it('[findByEmail], email is empty string, returns null', async () => {
-    const user = await service.findByEmail('');
-
-    expect(user).toBeNull();
+  describe('createUser', () => {
+    it('provided email is in use, throws an error', async () => {
+      const expectedException = new BadRequestException('User with this email already exists');
+  
+      await expect(service.createUser(defaultEmail, defaultPassword)).rejects.toThrow(expectedException);
+    })
+  
+    it('saves and returns user', async () => {
+      repository.findOne = jest.fn().mockResolvedValueOnce(null);
+      const user = await service.createUser(defaultEmail, defaultPassword);
+  
+      expect(user).toBeDefined();
+      expect(user.email).toBe(defaultEmail);
+      expect(user.password).toBe(defaultPassword);
+      expect(user.id).toBe(1);
+    })
   })
 
-  it('[findByEmail], valid email passed, returns user', async () => {
-    const user = await service.findByEmail(defaultEmail);
-
-    expect(user).toBeDefined();
-    expect(user.email).toBe(defaultEmail);
-    expect(user.password).toBe(defaultPassword);
-    expect(user.id).toBe(1);
+  describe('update', () => {
+    it('passed invalid number as an Id, throws an error', async () => {
+      const expectedException = new BadRequestException('User Id is needed');
+  
+      await expect(service.update(NaN, { email: defaultEmail })).rejects.toThrow(expectedException);
+    })
+  
+    it('returns updated user', async () => {
+      const defaultUser = defaultUserFunc();
+      repository.create = jest.fn().mockImplementationOnce((update) => Promise.resolve({ ...defaultUser, ...update }));
+      const userUpdate = { email: 'newEmail@test.com' };
+  
+      const user = await service.update(1, userUpdate);
+  
+      expect(user).toBeDefined();
+      expect(user.id).toBe(defaultUser.id);
+      expect(user.email).toBe(userUpdate.email);
+      expect(user.password).toBe(defaultUser.password);
+    })
   })
 
-  it('[findAll], returns couple of users', async () => {
-    repository.find = jest.fn().mockResolvedValueOnce(Array(3).map(defaultUserFunc));
-    const users = await service.findAll();
-
-    expect(users).toHaveLength(3);
-  })
-
-  it('[createUser], provided email is in use, throws an error', async () => {
-    const expectedException = new BadRequestException('User with this email already exists');
-
-    await expect(service.createUser(defaultEmail, defaultPassword)).rejects.toThrow(expectedException);
-  })
-
-  it('[createUser], saves and returns user', async () => {
-    repository.findOne = jest.fn().mockResolvedValueOnce(null);
-    const user = await service.createUser(defaultEmail, defaultPassword);
-
-    expect(user).toBeDefined();
-    expect(user.email).toBe(defaultEmail);
-    expect(user.password).toBe(defaultPassword);
-    expect(user.id).toBe(1);
-  })
-
-  it('[update], passed invalid number as an Id, throws an error', async () => {
-    const expectedException = new BadRequestException('User Id is needed');
-
-    await expect(service.update(NaN, { email: defaultEmail })).rejects.toThrow(expectedException);
-  })
-
-  it('[update], returns updated user', async () => {
-    const defaultUser = defaultUserFunc();
-    repository.create = jest.fn().mockImplementationOnce((update) => Promise.resolve({ ...defaultUser, ...update }));
-    const userUpdate = { email: 'newEmail@test.com' };
-
-    const user = await service.update(1, userUpdate);
-
-    expect(user).toBeDefined();
-    expect(user.id).toBe(defaultUser.id);
-    expect(user.email).toBe(userUpdate.email);
-    expect(user.password).toBe(defaultUser.password);
-  })
-
-  it('[remove], passed invalid number as an Id, throws an error', async () => {
-    const expectedException = new BadRequestException('User Id is needed');
-
-    await expect(service.remove(NaN)).rejects.toThrow(expectedException);
-  })
-
-  it('[remove], returns removed user', async () => {
-    const user = await service.remove(13);
-    console.log(user)
-
-    expect(user).toBeDefined();
-    expect(user.id).toBe(13);
+  describe('remove', () => {
+    it('passed invalid number as an Id, throws an error', async () => {
+      const expectedException = new BadRequestException('User Id is needed');
+  
+      await expect(service.remove(NaN)).rejects.toThrow(expectedException);
+    })
+  
+    it('returns removed user', async () => {
+      const user = await service.remove(13);
+  
+      expect(user).toBeDefined();
+      expect(user.id).toBe(13);
+    })
   })
 });

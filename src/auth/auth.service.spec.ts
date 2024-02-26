@@ -33,38 +33,42 @@ describe('AuthService', () => {
     expect(service).toBeDefined();
   });
 
-  it('[signup], email is already registered, throws an error', async () => {
-    const expectedException = new BadRequestException('This email is already in use');
-    await expect(service.singup(defaultEmail, defaultPassword)).rejects.toThrow(expectedException);
+  describe('signup', () => {
+    it('email is already registered, throws an error', async () => {
+      const expectedException = new BadRequestException('This email is already in use');
+      await expect(service.singup(defaultEmail, defaultPassword)).rejects.toThrow(expectedException);
+    })
+  
+    it('user is created and returned', async () => {
+      fakeUserService.findByEmail = async (email: string) => null;
+      const user = await service.singup(defaultEmail, defaultPassword);
+  
+      expect(user).toBeDefined();
+      expect(user.email).toBe(defaultEmail);
+    })
   })
 
-  it('[signup], user is created and returned', async () => {
-    fakeUserService.findByEmail = async (email: string) => null;
-    const user = await service.singup(defaultEmail, defaultPassword);
-
-    expect(user).toBeDefined();
-    expect(user.email).toBe(defaultEmail);
-  })
-
-  it('[login], email is not correct, throws an error', async () => {
-    fakeUserService.findByEmail = async (email: string) => null;
-    const email = 'incorrect-email@test.com';
-    const expectedException = new BadRequestException('Username or password is incorrect');
-    await expect(service.login(email, defaultPassword)).rejects.toThrow(expectedException);
-  })
-
-  it('[login], password is not correct, throws an error', async () => {
-    const expectedException = new BadRequestException('Username or password is incorrect')
-    await expect(service.login(defaultEmail, 'incorrectpassword')).rejects.toThrow(expectedException);
-  })
-
-  it('[login], data is correct, return a user', async () => {
-    const hashedPassword = await hashPassword(defaultPassword);
-    fakeUserService.findByEmail = async (email: string) => ({ id: 1, email, password: hashedPassword });
-
-    const user = await service.login(defaultEmail, defaultPassword);
-
-    expect(user).toBeDefined();
-    expect(user.email).toBe(defaultEmail);
+  describe('login', () => {
+    it('email is not correct, throws an error', async () => {
+      fakeUserService.findByEmail = async (email: string) => null;
+      const email = 'incorrect-email@test.com';
+      const expectedException = new BadRequestException('Username or password is incorrect');
+      await expect(service.login(email, defaultPassword)).rejects.toThrow(expectedException);
+    })
+  
+    it('password is not correct, throws an error', async () => {
+      const expectedException = new BadRequestException('Username or password is incorrect')
+      await expect(service.login(defaultEmail, 'incorrectpassword')).rejects.toThrow(expectedException);
+    })
+  
+    it('data is correct, return a user', async () => {
+      const hashedPassword = await hashPassword(defaultPassword);
+      fakeUserService.findByEmail = async (email: string) => ({ id: 1, email, password: hashedPassword });
+  
+      const user = await service.login(defaultEmail, defaultPassword);
+  
+      expect(user).toBeDefined();
+      expect(user.email).toBe(defaultEmail);
+    })
   })
 });
