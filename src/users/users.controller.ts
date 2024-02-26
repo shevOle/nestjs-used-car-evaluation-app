@@ -41,7 +41,7 @@ export class UsersController {
     @Patch('/:id')
     async updateUser(
         @Param('id') id: string,
-        @Body() body: UpdateUserDto,
+        @Body() body: Partial<UpdateUserDto>,
         @Response() res: IRespone,
     ) {
         const parsedId = parseInt(id);
