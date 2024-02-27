@@ -18,14 +18,15 @@ config();
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      envFilePath:  `.env.${process.env.NODE_ENV}`,
+      cache: false,
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         return {
           type: 'sqlite',
-          database: config.get('DB_NAME'),
+          database: config.get<string>('DB_NAME'),
           entities: [User, Report],
           synchronize: true,
         }
@@ -51,6 +52,6 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(cookieSession({
       keys: this.config.get('COOKIE_KEYS').split(','),
-    }))
+    })).forRoutes('*');
   }
 }

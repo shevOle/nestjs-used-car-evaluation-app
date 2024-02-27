@@ -3,8 +3,9 @@
 /node_modules
 /build
 db.sqlite
-db.test
+test.sqlite
 .env.test
+.env.development
 
 # Logs
 logs
