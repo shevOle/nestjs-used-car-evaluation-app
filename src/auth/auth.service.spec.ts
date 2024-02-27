@@ -1,19 +1,26 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { randomBytes } from 'crypto';
 import { AuthService } from './auth.service';
-import { hashPassword } from './helpers/hashPassword.helper';
 import { UsersService } from '../users/users.service';
+import { UtilsService } from '../utils/utils.service';
 
 describe('AuthService', () => {
   let service: AuthService;
   let fakeUserService: Partial<UsersService>;
+  let fakeUtilsService: Partial<UtilsService>;
   const defaultEmail = 'email@test.com';
   const defaultPassword = 'password';
+  const randomHashedPassword = randomBytes(24).toString('hex');
 
   beforeEach(async () => {
     fakeUserService = {
       findByEmail: async (email: string) => ({ id: 1, email, password: defaultPassword }),
       createUser: async (email: string, password: string) => ({ id: 1, email, password }),
+    }
+
+    fakeUtilsService = {
+      hashPassword: jest.fn(async () => randomHashedPassword),
     }
 
     const module: TestingModule = await Test.createTestingModule({
@@ -22,6 +29,10 @@ describe('AuthService', () => {
         {
           provide: UsersService,
           useValue: fakeUserService,
+        },
+        {
+          provide: UtilsService,
+          useValue: fakeUtilsService,
         }
       ],
     }).compile();
@@ -62,8 +73,7 @@ describe('AuthService', () => {
     })
   
     it('data is correct, return a user', async () => {
-      const hashedPassword = await hashPassword(defaultPassword);
-      fakeUserService.findByEmail = async (email: string) => ({ id: 1, email, password: hashedPassword });
+      fakeUserService.findByEmail = async (email: string) => ({ id: 1, email, password: randomHashedPassword });
   
       const user = await service.login(defaultEmail, defaultPassword);
   

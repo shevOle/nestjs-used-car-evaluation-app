@@ -2,7 +2,6 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { hashPassword } from './helpers/hashPassword.helper';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -10,16 +9,11 @@ describe('AuthController', () => {
   
   const defaultEmail = 'email@test.com';
   const defaultPassword = 'password';
-  let hashedDefaulPassword: string;
-
-  beforeAll(async () => {
-    hashedDefaulPassword = await hashPassword(defaultPassword);
-  })
 
   beforeEach(async () => {
     fakeAuthService = {
-      singup: async (email: string, password: string) => ({ id: 1, email, password : hashedDefaulPassword}),
-      login: async (email: string, password: string) => ({ id: 1, email, password : hashedDefaulPassword}),
+      singup: async (email: string, password: string) => ({ id: 1, email, password}),
+      login: async (email: string, password: string) => ({ id: 1, email, password}),
     }
 
     const module: TestingModule = await Test.createTestingModule({
@@ -64,7 +58,7 @@ describe('AuthController', () => {
 
 
   describe('loginUser', () => {
-    it('creates user and returns OK', async () => {
+    it('logs user in and returns OK', async () => {
       const responseObjectMock = {
         sendStatus: jest.fn()
       }
