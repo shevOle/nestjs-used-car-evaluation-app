@@ -24,8 +24,10 @@ config();
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
+        const dropSchema = process.env.NODE_ENV === 'test';
         return {
           type: 'sqlite',
+          dropSchema,
           database: config.get<string>('DB_NAME'),
           entities: [User, Report],
           synchronize: true,
