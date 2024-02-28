@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'dotenv';
 import { UsersModule } from './users/users.module';
 import { ReportsModule } from './reports/reports.module';
-import { Report } from './reports/report.entity';
-import { User } from './users/user.entity';
+import { Report } from './entities/report.entity';
+import { User } from './entities/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { UtilsModule } from './utils/utils.module';
 import { AppController } from './app.controller';
@@ -19,7 +19,7 @@ config();
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath:  `.env.${process.env.NODE_ENV}`,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
       cache: false,
     }),
     TypeOrmModule.forRootAsync({
@@ -32,8 +32,8 @@ config();
           database: config.get<string>('DB_NAME'),
           entities: [User, Report],
           synchronize: true,
-        }
-      }
+        };
+      },
     }),
     UsersModule,
     ReportsModule,
@@ -45,17 +45,21 @@ config();
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
-      })
-    }
+      }),
+    },
   ],
-  controllers: [AppController]
+  controllers: [AppController],
 })
 export class AppModule {
   constructor(private config: ConfigService) {}
-  
+
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(cookieSession({
-      keys: this.config.get('COOKIE_KEYS').split(','),
-    })).forRoutes('*');
+    consumer
+      .apply(
+        cookieSession({
+          keys: this.config.get('COOKIE_KEYS').split(','),
+        }),
+      )
+      .forRoutes('*');
   }
 }
