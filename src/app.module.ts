@@ -9,6 +9,7 @@ import { Report } from './reports/report.entity';
 import { User } from './users/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { UtilsModule } from './utils/utils.module';
+import { AppController } from './app.controller';
 
 const cookieSession = require('cookie-session');
 
@@ -46,7 +47,8 @@ config();
         whitelist: true,
       })
     }
-  ]
+  ],
+  controllers: [AppController]
 })
 export class AppModule {
   constructor(private config: ConfigService) {}
