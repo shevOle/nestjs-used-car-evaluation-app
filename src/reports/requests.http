@@ -1,0 +1,12 @@
+POST http://localhost:3000/reports
+Content-Type: application/json
+
+{
+    "make": "Honda",
+    "model": "Civic",
+    "year": 2005,
+    "price": 1000,
+    "mileage": 200000,
+    "lat": 41.40338,
+    "lng": 2
+}
