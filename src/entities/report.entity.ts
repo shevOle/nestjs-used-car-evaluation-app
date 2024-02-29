@@ -40,7 +40,7 @@ export class Report {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column()
+  @Column({ nullable: true })
   updatedByUserId: number;
 
   @Column({ enum: ['new', 'approved', 'rejected'], default: 'new' })
