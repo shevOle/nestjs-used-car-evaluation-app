@@ -11,19 +11,16 @@ import {
 } from '@nestjs/common';
 import { Response as IResponse } from 'express';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './dtos/create-user.dto';
-import { LoginUserDto } from './dtos/login-user.dto';
+import { CreateUserRequestDto } from './dtos/create-user.request.dto';
+import { LoginUserRequestDto } from './dtos/login-user.request.dto';
 import { CurrentUser } from '../decorators/current-user.decorator';
-import { PublicUserDto } from '../users/dtos/public-user.dto';
 import { User } from '../entities/user.entity';
-import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Serialize(PublicUserDto)
   @UseGuards(AuthGuard)
   @Get('/whoami')
   whoAmI(@CurrentUser() user: User) {
@@ -32,7 +29,7 @@ export class AuthController {
 
   @Post('/signup')
   async signupUser(
-    @Body() body: CreateUserDto,
+    @Body() body: CreateUserRequestDto,
     @Response() res: IResponse,
     @Session() session: any,
   ) {
@@ -48,7 +45,7 @@ export class AuthController {
 
   @Post('/login')
   async loginUser(
-    @Body() body: LoginUserDto,
+    @Body() body: LoginUserRequestDto,
     @Response() res: IResponse,
     @Session() session: any,
   ) {
