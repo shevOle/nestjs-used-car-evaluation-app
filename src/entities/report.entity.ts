@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -35,6 +36,15 @@ export class Report {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @Column()
+  updatedByUserId: number;
+
+  @Column({ enum: ['new', 'approved', 'rejected'], default: 'new' })
+  status: string;
 
   @ManyToOne(() => User, (user) => user.reports)
   user: User;
