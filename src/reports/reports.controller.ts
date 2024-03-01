@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   Patch,
   Param,
@@ -19,6 +20,16 @@ import { User } from '../entities/user.entity';
 @Controller('reports')
 export class ReportsController {
   constructor(private reportService: ReportsService) {}
+
+  @Get('/own')
+  getMyReports(@CurrentUser() user: User) {
+    return this.reportService.findByUserId(user.id);
+  }
+
+  @Get('/:id')
+  getOne(@Param('id') id: number) {
+    return this.reportService.findById(id);
+  }
 
   @Post()
   async createReport(
