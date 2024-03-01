@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateReportRequestDto } from './dtos/create-report.request.dto';
@@ -10,6 +14,17 @@ export class ReportsService {
   constructor(
     @InjectRepository(Report) private reportRepository: Repository<Report>,
   ) {}
+
+  findByUserId(userId: number) {
+    return this.reportRepository.find({ where: { user: { id: userId } } });
+  }
+
+  async findById(id: number) {
+    const report = await this.reportRepository.findOne({ where: { id } });
+    if (!report) throw new NotFoundException('Report not found');
+
+    return report;
+  }
 
   create(currentUser: User, reportData: CreateReportRequestDto) {
     const currentYear = new Date().getFullYear();
