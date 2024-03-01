@@ -1,12 +1,18 @@
+GET http://localhost:3000/reports/own
+
+###
+GET http://localhost:3000/reports/5
+
+###
 POST http://localhost:3000/reports
 Content-Type: application/json
 
 {
     "make": "Honda",
-    "model": "Civic",
-    "year": 2005,
-    "price": 1000,
-    "mileage": 200000,
+    "model": "Accord",
+    "year": 2001,
+    "price": 10000,
+    "mileage": 1000000,
     "lat": 41.40338,
     "lng": 2
 }
