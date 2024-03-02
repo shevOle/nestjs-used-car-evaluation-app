@@ -1,7 +1,7 @@
 import { NestMiddleware, Injectable } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { UsersService } from '../users/users.service';
-import { User } from '../entities/user.entity';
+import { UsersService } from '../../users/users.service';
+import { User } from '../../entities/user.entity';
 
 interface RequestWithCurrentUser extends Request {
   currentUser?: User;

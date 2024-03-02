@@ -10,15 +10,15 @@ Content-Type: application/json
 {
     "make": "Honda",
     "model": "Accord",
-    "year": 2001,
+    "year": 2004,
     "price": 10000,
-    "mileage": 1000000,
-    "lat": 41.40338,
+    "mileage": 10000,
+    "lat": 1,
     "lng": 2
 }
 
 ###
-PATCH http://localhost:3000/reports/4
+PATCH http://localhost:3000/reports/8
 Content-Type: application/json
 
 {

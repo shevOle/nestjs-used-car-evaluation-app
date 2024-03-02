@@ -14,8 +14,8 @@ import { Response as IRespone } from 'express';
 import { UsersService } from './users.service';
 import { UpdateUserRequestDto } from './dtos/update-user.request.dto';
 import { PublicUserDto } from './dtos/public-user.dto';
-import { Serialize } from '../interceptors/serialize.interceptor';
-import { AuthGuard } from '../guards/auth.guard';
+import { Serialize } from '../common/interceptors/serialize.interceptor';
+import { AuthGuard } from '../common/guards/auth.guard';
 
 @UseGuards(AuthGuard)
 @Serialize(PublicUserDto)

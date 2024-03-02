@@ -12,10 +12,10 @@ import { Response as IResponse } from 'express';
 import { ReportsService } from './reports.service';
 import { CreateReportRequestDto } from './dtos/create-report.request.dto';
 import { CheckReportRquestDto } from './dtos/check-report.request.dto';
-import { AuthGuard } from '../guards/auth.guard';
-import { CurrentUser } from '../decorators/current-user.decorator';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '../entities/user.entity';
-import { AdminAuthGuard } from '../guards/admin-auth.guard';
+import { AdminAuthGuard } from '../common/guards/admin-auth.guard';
 
 @UseGuards(AuthGuard)
 @Controller('reports')

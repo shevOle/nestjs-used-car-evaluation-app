@@ -13,9 +13,9 @@ import { Response as IResponse } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserRequestDto } from './dtos/create-user.request.dto';
 import { LoginUserRequestDto } from './dtos/login-user.request.dto';
-import { CurrentUser } from '../decorators/current-user.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '../entities/user.entity';
-import { AuthGuard } from '../guards/auth.guard';
+import { AuthGuard } from '../common/guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
