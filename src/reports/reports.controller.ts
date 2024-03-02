@@ -15,6 +15,7 @@ import { CheckReportRquestDto } from './dtos/check-report.request.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { User } from '../entities/user.entity';
+import { AdminAuthGuard } from '../guards/admin-auth.guard';
 
 @UseGuards(AuthGuard)
 @Controller('reports')
@@ -42,6 +43,7 @@ export class ReportsController {
   }
 
   @Patch('/:id')
+  @UseGuards(AdminAuthGuard)
   async checkReport(
     @CurrentUser() user: User,
     @Param('id') id: number,
