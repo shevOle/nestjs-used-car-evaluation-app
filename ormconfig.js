@@ -1,5 +1,6 @@
 const typeOrmConfig = {
   synchronize: false,
+  migrations: ['./migrations/*.js'],
 };
 
 switch (process.env.NODE_ENV) {
@@ -8,7 +9,6 @@ switch (process.env.NODE_ENV) {
       type: 'sqlite',
       database: 'db.sqlite',
       entities: ['**/*.entity.js'],
-      synchronize: true,
     });
     break;
   case 'test':
