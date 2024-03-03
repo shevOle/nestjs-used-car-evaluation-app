@@ -22,6 +22,16 @@ import { AdminAuthGuard } from '../common/guards/admin-auth.guard';
 export class ReportsController {
   constructor(private reportService: ReportsService) {}
 
+  @Post('/many/randomstring-kasjfnasklj')
+  async createMany(
+    @CurrentUser() currentUser: User,
+    @Body() body: CreateReportRequestDto[],
+    @Res() res: IResponse,
+  ) {
+    await this.reportService.createMany(currentUser, body);
+    return res.sendStatus(201);
+  }
+
   @Get('/own')
   getMyReports(@CurrentUser() user: User) {
     return this.reportService.findByUserId(user.id);

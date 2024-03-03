@@ -15,6 +15,19 @@ export class ReportsService {
     @InjectRepository(Report) private reportRepository: Repository<Report>,
   ) {}
 
+  createMany(currentUser: User, reportsData: CreateReportRequestDto[]) {
+    const reports = reportsData.map((report) => ({
+      ...report,
+      user: currentUser,
+    }));
+    return this.reportRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Report)
+      .values(reports)
+      .execute();
+  }
+
   findByUserId(userId: number) {
     return this.reportRepository.find({ where: { user: { id: userId } } });
   }

@@ -24,3 +24,294 @@ Content-Type: application/json
 {
     "approved": true
 }
+
+###
+# random data generator template - https://www.jsongenerator.io/
+#[
+#  "repeat( 1,40)",
+#  {
+#    "make": "enum(toyota, ford, honda, audi)",
+#    "model": "enum(civic, bronco, corolla, a6)",
+#    "year": "int(1980, 1985)",
+#    "mileage": "int(100000, 120000)",
+#    "lat": "int(5, 10)",
+#    "lng": "int(5, 10)",
+#    "price": "int(1000, 100000)"
+#  }
+#]
+
+POST http://localhost:3000/reports/many/randomstring-kasjfnasklj
+Content-Type: application/json
+
+[
+  {
+    "make": "honda",
+    "model": "a6",
+    "year": 1985,
+    "mileage": 116878,
+    "lat": 10,
+    "lng": 5,
+    "price": 87569
+  },
+  {
+    "make": "honda",
+    "model": "civic",
+    "year": 1985,
+    "mileage": 100267,
+    "lat": 6,
+    "lng": 10,
+    "price": 7546
+  },
+  {
+    "make": "audi",
+    "model": "bronco",
+    "year": 1983,
+    "mileage": 101487,
+    "lat": 6,
+    "lng": 10,
+    "price": 61993
+  },
+  {
+    "make": "toyota",
+    "model": "civic",
+    "year": 1984,
+    "mileage": 105690,
+    "lat": 7,
+    "lng": 8,
+    "price": 81305
+  },
+  {
+    "make": "toyota",
+    "model": "a6",
+    "year": 1984,
+    "mileage": 113883,
+    "lat": 5,
+    "lng": 10,
+    "price": 87113
+  },
+  {
+    "make": "honda",
+    "model": "civic",
+    "year": 1984,
+    "mileage": 104500,
+    "lat": 7,
+    "lng": 5,
+    "price": 43654
+  },
+  {
+    "make": "toyota",
+    "model": "civic",
+    "year": 1983,
+    "mileage": 102335,
+    "lat": 9,
+    "lng": 5,
+    "price": 86626
+  },
+  {
+    "make": "audi",
+    "model": "corolla",
+    "year": 1983,
+    "mileage": 105087,
+    "lat": 10,
+    "lng": 5,
+    "price": 53760
+  },
+  {
+    "make": "honda",
+    "model": "a6",
+    "year": 1985,
+    "mileage": 115911,
+    "lat": 5,
+    "lng": 8,
+    "price": 97463
+  },
+  {
+    "make": "ford",
+    "model": "a6",
+    "year": 1980,
+    "mileage": 112183,
+    "lat": 5,
+    "lng": 6,
+    "price": 76369
+  },
+  {
+    "make": "toyota",
+    "model": "a6",
+    "year": 1981,
+    "mileage": 106660,
+    "lat": 8,
+    "lng": 8,
+    "price": 98334
+  },
+  {
+    "make": "toyota",
+    "model": "corolla",
+    "year": 1984,
+    "mileage": 119093,
+    "lat": 10,
+    "lng": 9,
+    "price": 97177
+  },
+  {
+    "make": "toyota",
+    "model": "corolla",
+    "year": 1980,
+    "mileage": 119426,
+    "lat": 10,
+    "lng": 10,
+    "price": 9897
+  },
+  {
+    "make": "toyota",
+    "model": "a6",
+    "year": 1980,
+    "mileage": 112395,
+    "lat": 8,
+    "lng": 5,
+    "price": 40365
+  },
+  {
+    "make": "audi",
+    "model": "corolla",
+    "year": 1984,
+    "mileage": 109678,
+    "lat": 7,
+    "lng": 7,
+    "price": 79895
+  },
+  {
+    "make": "ford",
+    "model": "civic",
+    "year": 1982,
+    "mileage": 118117,
+    "lat": 9,
+    "lng": 6,
+    "price": 58235
+  },
+  {
+    "make": "ford",
+    "model": "bronco",
+    "year": 1985,
+    "mileage": 101045,
+    "lat": 10,
+    "lng": 7,
+    "price": 18614
+  },
+  {
+    "make": "audi",
+    "model": "corolla",
+    "year": 1983,
+    "mileage": 117634,
+    "lat": 9,
+    "lng": 10,
+    "price": 76559
+  },
+  {
+    "make": "audi",
+    "model": "corolla",
+    "year": 1981,
+    "mileage": 106653,
+    "lat": 6,
+    "lng": 10,
+    "price": 93122
+  },
+  {
+    "make": "audi",
+    "model": "corolla",
+    "year": 1980,
+    "mileage": 104862,
+    "lat": 6,
+    "lng": 8,
+    "price": 53522
+  },
+  {
+    "make": "honda",
+    "model": "civic",
+    "year": 1981,
+    "mileage": 106526,
+    "lat": 9,
+    "lng": 10,
+    "price": 79615
+  },
+  {
+    "make": "ford",
+    "model": "corolla",
+    "year": 1980,
+    "mileage": 109736,
+    "lat": 8,
+    "lng": 8,
+    "price": 33404
+  },
+  {
+    "make": "toyota",
+    "model": "a6",
+    "year": 1980,
+    "mileage": 105633,
+    "lat": 9,
+    "lng": 5,
+    "price": 24303
+  },
+  {
+    "make": "audi",
+    "model": "civic",
+    "year": 1982,
+    "mileage": 101301,
+    "lat": 5,
+    "lng": 9,
+    "price": 3049
+  },
+  {
+    "make": "toyota",
+    "model": "corolla",
+    "year": 1984,
+    "mileage": 104457,
+    "lat": 7,
+    "lng": 7,
+    "price": 38744
+  },
+  {
+    "make": "audi",
+    "model": "a6",
+    "year": 1985,
+    "mileage": 104230,
+    "lat": 9,
+    "lng": 7,
+    "price": 75674
+  },
+  {
+    "make": "honda",
+    "model": "civic",
+    "year": 1981,
+    "mileage": 113450,
+    "lat": 9,
+    "lng": 6,
+    "price": 47948
+  },
+  {
+    "make": "honda",
+    "model": "civic",
+    "year": 1984,
+    "mileage": 102648,
+    "lat": 5,
+    "lng": 7,
+    "price": 61622
+  },
+  {
+    "make": "toyota",
+    "model": "corolla",
+    "year": 1983,
+    "mileage": 111326,
+    "lat": 7,
+    "lng": 8,
+    "price": 66572
+  },
+  {
+    "make": "toyota",
+    "model": "bronco",
+    "year": 1981,
+    "mileage": 104099,
+    "lat": 8,
+    "lng": 6,
+    "price": 30079
+  }
+]
