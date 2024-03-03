@@ -4,8 +4,6 @@
 /build
 db.sqlite
 test.sqlite
-.env.test
-.env.development
 .vscode
 
 # Logs
