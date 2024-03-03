@@ -14,10 +14,9 @@ switch (process.env.NODE_ENV) {
   case 'test':
     Object.assign(typeOrmConfig, {
       type: 'sqlite',
-      dropSchema: true,
       database: ':memory:',
       entities: ['**/*.entity.ts'],
-      synchronize: true,
+      migrationsRun: true,
     });
     break;
   case 'production':
