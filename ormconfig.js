@@ -20,6 +20,15 @@ switch (process.env.NODE_ENV) {
     });
     break;
   case 'production':
+    Object.assign(typeOrmConfig, {
+      type: 'postgress',
+      url: process.env.DATABASE_URL, // provided by Heroku
+      migrationsRun: true,
+      entities: ['**/*.entity.js'],
+      ssl: {
+        rejectUnauthorized: false, // to avoid self-signed sertificate error
+      },
+    });
     break;
   default:
     throw new Error('Unknown environment');
