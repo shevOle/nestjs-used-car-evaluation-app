@@ -16,7 +16,7 @@ import { LoginUserRequestDto } from './dtos/login-user.request.dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '../entities/user.entity';
 import { AuthGuard } from '../common/guards/auth.guard';
-import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { Serialize } from '../common/interceptors/serialize.interceptor';
 import { PublicUserDto } from '../users/dtos/public-user.dto';
 
 @Controller('auth')
