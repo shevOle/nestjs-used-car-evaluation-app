@@ -16,7 +16,7 @@ import { CheckReportRquestDto } from './dtos/check-report.request.dto';
 import { GetEstimateRequestDto } from './dtos/get-estimate.request.dto';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { User } from '../entities/user.entity';
+import { User } from '../db/entities/user.entity';
 import { AdminAuthGuard } from '../common/guards/admin-auth.guard';
 
 @UseGuards(AuthGuard)
