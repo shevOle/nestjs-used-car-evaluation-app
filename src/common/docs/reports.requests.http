@@ -315,3 +315,6 @@ Content-Type: application/json
     "price": 30079
   }
 ]
+
+###
+GET http://localhost:3000/reports/estimate?make=honda&model=civic&year=1983&lat=7&lng=5&mileage=101000

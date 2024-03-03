@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateReportRequestDto } from './dtos/create-report.request.dto';
+import { GetEstimateRequestDto } from './dtos/get-estimate.request.dto';
 import { Report } from '../entities/report.entity';
 import { User } from '../entities/user.entity';
 
@@ -37,6 +38,21 @@ export class ReportsService {
     if (!report) throw new NotFoundException('Report not found');
 
     return report;
+  }
+
+  getEstimate({ lat, lng, make, mileage, model, year }: GetEstimateRequestDto) {
+    return this.reportRepository
+      .createQueryBuilder()
+      .select('AVG(price)', 'price')
+      .where('make = :make', { make })
+      .andWhere('model = :model', { model })
+      .andWhere('year - :year BETWEEN -3 AND 3', { year })
+      .andWhere('lat - :lat BETWEEN -5 AND 5', { lat })
+      .andWhere('lng - :lng BETWEEN -5 AND 5', { lng })
+      .orderBy('ABS(mileage - :mileage)', 'ASC')
+      .setParameters({ mileage })
+      .limit(5)
+      .getRawOne();
   }
 
   create(currentUser: User, reportData: CreateReportRequestDto) {
