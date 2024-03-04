@@ -16,7 +16,7 @@ export class ReportsService {
     @InjectRepository(Report) private reportRepository: Repository<Report>,
   ) {}
 
-  createMany(currentUser: User, reportsData: CreateReportRequestDto[]) {
+  async createMany(currentUser: User, reportsData: CreateReportRequestDto[]) {
     const reports = reportsData.map((report) => ({
       ...report,
       user: currentUser,
@@ -29,7 +29,7 @@ export class ReportsService {
       .execute();
   }
 
-  findByUserId(userId: number) {
+  async findByUserId(userId: number) {
     return this.reportRepository.find({ where: { user: { id: userId } } });
   }
 
@@ -40,7 +40,14 @@ export class ReportsService {
     return report;
   }
 
-  getEstimate({ lat, lng, make, mileage, model, year }: GetEstimateRequestDto) {
+  async getEstimate({
+    lat,
+    lng,
+    make,
+    mileage,
+    model,
+    year,
+  }: GetEstimateRequestDto) {
     return this.reportRepository
       .createQueryBuilder()
       .select('AVG(price)', 'price')
@@ -55,7 +62,7 @@ export class ReportsService {
       .getRawOne();
   }
 
-  create(currentUser: User, reportData: CreateReportRequestDto) {
+  async create(currentUser: User, reportData: CreateReportRequestDto) {
     const currentYear = new Date().getFullYear();
     if (reportData.year > currentYear)
       throw new BadRequestException('You can not sell a car from the future!');
