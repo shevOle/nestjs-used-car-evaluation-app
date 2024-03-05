@@ -16,6 +16,7 @@ export class ReportsService {
     @InjectRepository(Report) private reportRepository: Repository<Report>,
   ) {}
 
+  // development utility
   async createMany(currentUser: User, reportsData: CreateReportRequestDto[]) {
     const reports = reportsData.map((report) => ({
       ...report,
@@ -29,11 +30,18 @@ export class ReportsService {
       .execute();
   }
 
-  async findByUserId(userId: number) {
-    return this.reportRepository.find({ where: { user: { id: userId } } });
+  async findByUserId(userId: number): Promise<Report[]> {
+    const id = Number(userId);
+    if (!id)
+      throw new BadRequestException('Id is required and should be a number');
+
+    return this.reportRepository.find({ where: { user: { id } } });
   }
 
-  async findById(id: number) {
+  async findById(_id: number): Promise<Report> {
+    const id = Number(_id);
+    if (!id) throw new BadRequestException('Id is required');
+
     const report = await this.reportRepository.findOne({ where: { id } });
     if (!report) throw new NotFoundException('Report not found');
 
@@ -62,7 +70,10 @@ export class ReportsService {
       .getRawOne();
   }
 
-  async create(currentUser: User, reportData: CreateReportRequestDto) {
+  async create(
+    currentUser: User,
+    reportData: CreateReportRequestDto,
+  ): Promise<Report> {
     const currentYear = new Date().getFullYear();
     if (reportData.year > currentYear)
       throw new BadRequestException('You can not sell a car from the future!');
@@ -72,7 +83,11 @@ export class ReportsService {
     return this.reportRepository.save(report);
   }
 
-  async checkReport(id: number, currentser: User, appproved: boolean) {
+  async checkReport(
+    id: number,
+    currentser: User,
+    appproved: boolean,
+  ): Promise<Report> {
     const report = await this.reportRepository.findOne({ where: { id } });
     if (!report) throw new BadRequestException('Report not found');
 
