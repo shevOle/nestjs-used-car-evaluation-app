@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ReportsService } from './reports.service';
@@ -31,6 +31,8 @@ describe('ReportsService', () => {
     fakeRepository = {
       create: jest.fn((report) => ({ id: 1, ...report })),
       save: jest.fn(),
+      find: jest.fn(),
+      findOne: jest.fn((id) => Promise.resolve({ ...defaultReport, id })),
     };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -110,6 +112,66 @@ describe('ReportsService', () => {
         ...report,
         updatedByUserId: defaultUser.id,
         status: 'rejected',
+      });
+    });
+  });
+
+  describe('create many reports (development utility)', () => {
+    it('creates reports, OK', async () => {
+      repository.createQueryBuilder = jest.fn();
+
+      const reportsData = Array(5).fill(defaultReport);
+      await service.createMany(defaultUser, reportsData);
+
+      expect(repository.createQueryBuilder).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('find reports by user id', () => {
+    it('Id  is not a number, BAD_REQUEST', async () => {
+      const expectedException = new BadRequestException(
+        'Id is required and should be a number',
+      );
+
+      await expect(service.findByUserId('s' as any)).rejects.toThrow(
+        expectedException,
+      );
+    });
+
+    it('finds reports by user id, OK', async () => {
+      const id = 5;
+      await service.findByUserId(id);
+
+      expect(fakeRepository.find).toHaveBeenCalledWith({
+        where: { user: { id } },
+      });
+    });
+  });
+
+  describe('find one by id', () => {
+    it('Id  is not a number, BAD_REQUEST', async () => {
+      const expectedException = new BadRequestException(
+        'Id is required and should be a number',
+      );
+
+      await expect(service.findByUserId('s' as any)).rejects.toThrow(
+        expectedException,
+      );
+    });
+
+    it('report  not found, NOT_FOUND', async () => {
+      repository.findOne = jest.fn().mockResolvedValueOnce(null);
+
+      const expectedException = new NotFoundException('Report not found');
+      await expect(service.findById(2)).rejects.toThrow(expectedException);
+    });
+
+    it('finds a report, OK', async () => {
+      const id = 5;
+      await service.findById(id);
+
+      expect(fakeRepository.findOne).toHaveBeenCalledWith({
+        where: { id },
       });
     });
   });
