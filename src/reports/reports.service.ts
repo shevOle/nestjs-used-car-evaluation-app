@@ -48,14 +48,19 @@ export class ReportsService {
     return report;
   }
 
-  async getEstimate({
-    lat,
-    lng,
-    make,
-    mileage,
-    model,
-    year,
-  }: GetEstimateRequestDto) {
+  async getEstimate(params: GetEstimateRequestDto): Promise<{ price: number }> {
+    const { make, model } = params || {};
+    const mileage = Number(params?.mileage);
+    const year = Number(params?.year);
+    const lat = Number(params?.lat);
+    const lng = Number(params?.lng);
+
+    if ([make, model, mileage, year, lat, lng].some((v) => !v)) {
+      throw new BadRequestException(
+        'You have to provide make, model, mileage, year and your coordinates to get a precise report',
+      );
+    }
+
     return this.reportRepository
       .createQueryBuilder()
       .select('AVG(price)', 'price')
