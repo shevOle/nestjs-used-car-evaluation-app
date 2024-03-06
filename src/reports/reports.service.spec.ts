@@ -118,12 +118,29 @@ describe('ReportsService', () => {
 
   describe('create many reports (development utility)', () => {
     it('creates reports, OK', async () => {
-      repository.createQueryBuilder = jest.fn();
+      const intoFuncMock = jest.fn();
+      const valuesFuncMock = jest.fn();
+      repository.createQueryBuilder = jest.fn(() => ({
+        insert: jest.fn(() => ({
+          into: intoFuncMock.mockReturnValue({
+            values: valuesFuncMock.mockReturnValue({
+              execute: jest.fn(),
+            }),
+          }),
+        })),
+      })) as any;
 
       const reportsData = Array(5).fill(defaultReport);
       await service.createMany(defaultUser, reportsData);
 
+      const reportsDataWithUser = reportsData.map((r) => ({
+        ...r,
+        user: defaultUser,
+      }));
+
       expect(repository.createQueryBuilder).toHaveBeenCalledTimes(1);
+      expect(intoFuncMock).toHaveBeenCalledWith(Report);
+      expect(valuesFuncMock).toHaveBeenCalledWith(reportsDataWithUser);
     });
   });
 
@@ -173,6 +190,91 @@ describe('ReportsService', () => {
       expect(fakeRepository.findOne).toHaveBeenCalledWith({
         where: { id },
       });
+    });
+  });
+
+  describe('get estimate car value', () => {
+    it('some of the params are undefined, BAD_REQUEST', async () => {
+      const params = { ...defaultReport, model: undefined };
+      const expectedException = new BadRequestException(
+        'You have to provide make, model, mileage, year and your coordinates to get a precise report',
+      );
+
+      await expect(service.getEstimate(params)).rejects.toThrow(
+        expectedException,
+      );
+    });
+
+    it('some of the number params are NaN, BAD_REQUEST', async () => {
+      const params = { ...defaultReport, year: 'shs' as any };
+      const expectedException = new BadRequestException(
+        'You have to provide make, model, mileage, year and your coordinates to get a precise report',
+      );
+
+      await expect(service.getEstimate(params)).rejects.toThrow(
+        expectedException,
+      );
+    });
+
+    it('gets the estimate, OK', async () => {
+      const selectFuncMock = jest.fn();
+      const whereFuncMock = jest.fn();
+      const andwhere1FuncMock = jest.fn();
+      const andwhere2FuncMock = jest.fn();
+      const andwhere3FuncMock = jest.fn();
+      const andwhere4FuncMock = jest.fn();
+      const orderByFuncMock = jest.fn();
+      const setParamsFuncMock = jest.fn();
+      const getRawOneFuncMock = jest.fn();
+
+      repository.createQueryBuilder = jest.fn(() => ({
+        select: selectFuncMock.mockReturnValue({
+          where: whereFuncMock.mockReturnValue({
+            andWhere: andwhere1FuncMock.mockReturnValue({
+              andWhere: andwhere2FuncMock.mockReturnValue({
+                andWhere: andwhere3FuncMock.mockReturnValue({
+                  andWhere: andwhere4FuncMock.mockReturnValue({
+                    orderBy: orderByFuncMock.mockReturnValue({
+                      setParameters: setParamsFuncMock.mockReturnValue({
+                        getRawOne: getRawOneFuncMock,
+                      }),
+                    }),
+                  }),
+                }),
+              }),
+            }),
+          }),
+        }),
+      })) as any;
+
+      await service.getEstimate(defaultReport);
+      const { lat, lng, make, mileage, model, price, year } = defaultReport;
+
+      expect(selectFuncMock).toHaveBeenCalledWith('AVG(price)', 'price');
+      expect(whereFuncMock).toHaveBeenCalledWith('make = :make', {
+        make,
+      });
+      expect(andwhere1FuncMock).toHaveBeenCalledWith('model = :model', {
+        model,
+      });
+      expect(andwhere2FuncMock).toHaveBeenCalledWith(
+        'year - :year BETWEEN -3 AND 3',
+        { year },
+      );
+      expect(andwhere3FuncMock).toHaveBeenCalledWith(
+        'lat - :lat BETWEEN -5 AND 5',
+        { lat },
+      );
+      expect(andwhere4FuncMock).toHaveBeenCalledWith(
+        'lng - :lng BETWEEN -5 AND 5',
+        { lng },
+      );
+      expect(orderByFuncMock).toHaveBeenCalledWith(
+        'ABS(mileage - :mileage)',
+        'ASC',
+      );
+      expect(setParamsFuncMock).toHaveBeenCalledWith({ mileage });
+      expect(getRawOneFuncMock).toHaveBeenCalledTimes(1);
     });
   });
 });
