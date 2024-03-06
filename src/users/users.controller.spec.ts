@@ -2,29 +2,21 @@ import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { defaultEmail, defaultUser } from '../common/constants/test.constants';
 
 describe('UsersController', () => {
   let controller: UsersController;
   let fakeUserService: Partial<UsersService>;
-
-  const defaultEmail = 'email@test.com';
-  const defaultPassword = 'password';
-  const defaultUserFunc = () => ({
-    id: 1,
-    email: defaultEmail,
-    password: defaultPassword,
-    isAdmin: false,
-    reports: [],
-  });
+  const fakeResponse = { sendStatus: jest.fn() } as any;
 
   beforeEach(async () => {
     fakeUserService = {
       findByEmail: jest.fn((email: string) =>
-        Promise.resolve({ ...defaultUserFunc(), email }),
+        Promise.resolve({ ...defaultUser, email }),
       ),
-      findAll: jest.fn(() => Promise.resolve(Array(3).map(defaultUserFunc))),
+      findAll: jest.fn(() => Promise.resolve(Array(3).fill(defaultUser))),
       findById: jest.fn((id: number) =>
-        Promise.resolve({ ...defaultUserFunc(), id }),
+        Promise.resolve({ ...defaultUser, id }),
       ),
       update: jest.fn(),
       remove: jest.fn(),
@@ -78,7 +70,7 @@ describe('UsersController', () => {
     it('returns a user', async () => {
       const user = await controller.findUserById('3');
 
-      expect(user).toMatchObject({ ...defaultUserFunc(), id: 3 });
+      expect(user).toMatchObject({ ...defaultUser, id: 3 });
     });
   });
 
@@ -99,23 +91,21 @@ describe('UsersController', () => {
       );
 
       await expect(
-        controller.updateUser('-2', {} as any, {} as any),
+        controller.updateUser('-2', {} as any, fakeResponse),
       ).rejects.toThrow(expectedException);
     });
 
     it('updates user and returns OK', async () => {
-      const fakeResponse = { sendStatus: jest.fn() };
       const update = { email: 'sss@sss.com' };
-      await controller.updateUser('1', update, fakeResponse as any);
+      await controller.updateUser('1', update, fakeResponse);
 
       expect(fakeUserService.update).toHaveBeenCalledWith(1, update);
       expect(fakeResponse.sendStatus).toHaveBeenCalledWith(200);
     });
 
     it('empty update object passed, returns OK', async () => {
-      const fakeResponse = { sendStatus: jest.fn() };
       const update = {};
-      await controller.updateUser('1', update, fakeResponse as any);
+      await controller.updateUser('1', update, fakeResponse);
 
       expect(fakeUserService.update).toHaveBeenCalledWith(1, update);
       expect(fakeResponse.sendStatus).toHaveBeenCalledWith(200);
@@ -128,7 +118,7 @@ describe('UsersController', () => {
         'Id must be a positive number',
       );
 
-      await expect(controller.removeUser('a', {} as any)).rejects.toThrow(
+      await expect(controller.removeUser('a', fakeResponse)).rejects.toThrow(
         expectedException,
       );
     });
@@ -138,14 +128,13 @@ describe('UsersController', () => {
         'Id must be a positive number',
       );
 
-      await expect(controller.removeUser('-2', {} as any)).rejects.toThrow(
+      await expect(controller.removeUser('-2', fakeResponse)).rejects.toThrow(
         expectedException,
       );
     });
 
     it('removes user and returns NO_CONTENT', async () => {
-      const fakeResponse = { sendStatus: jest.fn() };
-      await controller.removeUser('1', fakeResponse as any);
+      await controller.removeUser('1', fakeResponse);
 
       expect(fakeUserService.remove).toHaveBeenCalledWith(1);
       expect(fakeResponse.sendStatus).toHaveBeenCalledWith(204);

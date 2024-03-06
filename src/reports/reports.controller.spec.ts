@@ -1,32 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Response } from 'express';
 import { ReportsController } from './reports.controller';
 import { ReportsService } from './reports.service';
-import { User } from 'src/db/entities/user.entity';
+import { defaultReport, defaultUser } from '../common/constants/test.constants';
 
 describe('ReportsController', () => {
   let controller: ReportsController;
   let fakeReportService: Partial<ReportsService>;
   const fakeResponseObj: any = {
     sendStatus: jest.fn(),
-  };
-
-  const defaultUser: User = {
-    id: 1,
-    email: 'test@email.com',
-    password: 'pass',
-    isAdmin: false,
-    reports: [],
-  };
-
-  const defaultReport = {
-    make: 'toyota',
-    model: 'corolla',
-    year: 1980,
-    lat: 1,
-    lng: 2,
-    mileage: 10000,
-    price: 1000,
   };
 
   beforeEach(async () => {

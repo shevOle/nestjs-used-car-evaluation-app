@@ -2,29 +2,27 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import {
+  defaultEmail,
+  defaultPassword,
+  defaultUser,
+} from '../common/constants/test.constants';
 
 describe('AuthController', () => {
   let controller: AuthController;
   let fakeAuthService: Partial<AuthService>;
 
-  const defaultEmail = 'email@test.com';
-  const defaultPassword = 'password';
-
   beforeEach(async () => {
     fakeAuthService = {
       singup: async (email: string, password: string) => ({
-        id: 1,
+        ...defaultUser,
         email,
         password,
-        isAdmin: false,
-        reports: [],
       }),
       login: async (email: string, password: string) => ({
-        id: 1,
+        ...defaultUser,
         email,
         password,
-        isAdmin: false,
-        reports: [],
       }),
     };
 

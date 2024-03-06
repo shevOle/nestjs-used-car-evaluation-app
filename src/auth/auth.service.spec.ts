@@ -1,33 +1,30 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { randomBytes } from 'crypto';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { UtilsService } from '../utils/utils.service';
+import {
+  defaultEmail,
+  defaultPassword,
+  randomHashedPassword,
+  defaultUser,
+} from '../common/constants/test.constants';
 
 describe('AuthService', () => {
   let service: AuthService;
   let fakeUserService: Partial<UsersService>;
   let fakeUtilsService: Partial<UtilsService>;
-  const defaultEmail = 'email@test.com';
-  const defaultPassword = 'password';
-  const randomHashedPassword = randomBytes(24).toString('hex');
 
   beforeEach(async () => {
     fakeUserService = {
       findByEmail: async (email: string) => ({
-        id: 1,
+        ...defaultUser,
         email,
-        password: defaultPassword,
-        isAdmin: false,
-        reports: [],
       }),
       createUser: async (email: string, password: string) => ({
-        id: 1,
+        ...defaultUser,
         email,
         password,
-        isAdmin: false,
-        reports: [],
       }),
     };
 
@@ -98,11 +95,9 @@ describe('AuthService', () => {
 
     it('data is correct, return a user', async () => {
       fakeUserService.findByEmail = async (email: string) => ({
-        id: 1,
+        ...defaultUser,
         email,
         password: randomHashedPassword,
-        isAdmin: false,
-        reports: [],
       });
 
       const user = await service.login(defaultEmail, defaultPassword);

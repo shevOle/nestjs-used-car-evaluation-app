@@ -4,29 +4,24 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from './users.service';
 import { User } from '../db/entities/user.entity';
+import {
+  defaultEmail,
+  defaultPassword,
+  defaultUser,
+} from '../common/constants/test.constants';
 
 describe('UsersService', () => {
   let service: UsersService;
   let repository: Repository<User>;
 
-  const defaultEmail = 'email@test.com';
-  const defaultPassword = 'password';
-  const defaultUserFunc = () => ({
-    id: 1,
-    email: defaultEmail,
-    password: defaultPassword,
-  });
-
   beforeEach(async () => {
     const fakeUserRepository = {
-      findOneBy: jest.fn(({ id }) =>
-        Promise.resolve({ ...defaultUserFunc(), id }),
-      ),
+      findOneBy: jest.fn(({ id }) => Promise.resolve({ ...defaultUser, id })),
       findOne: jest.fn(({ where: { email } }) =>
-        Promise.resolve({ ...defaultUserFunc(), email }),
+        Promise.resolve({ ...defaultUser, email }),
       ),
       create: jest.fn(({ email, password }) =>
-        Promise.resolve({ id: 1, email, password }),
+        Promise.resolve({ ...defaultUser, email, password }),
       ),
       save: jest.fn((user) => Promise.resolve(user)),
       remove: jest.fn((user) => Promise.resolve(user)),
@@ -93,7 +88,7 @@ describe('UsersService', () => {
     it('returns couple of users', async () => {
       repository.find = jest
         .fn()
-        .mockResolvedValueOnce(Array(3).map(defaultUserFunc));
+        .mockResolvedValueOnce(Array(3).fill(defaultUser));
       const users = await service.findAll();
 
       expect(users).toHaveLength(3);
@@ -132,7 +127,6 @@ describe('UsersService', () => {
     });
 
     it('returns updated user', async () => {
-      const defaultUser = defaultUserFunc();
       repository.create = jest
         .fn()
         .mockImplementationOnce((update) =>
