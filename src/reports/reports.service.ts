@@ -71,7 +71,6 @@ export class ReportsService {
       .andWhere('lng - :lng BETWEEN -5 AND 5', { lng })
       .orderBy('ABS(mileage - :mileage)', 'ASC')
       .setParameters({ mileage })
-      .limit(5)
       .getRawOne();
   }
 
