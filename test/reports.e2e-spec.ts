@@ -497,4 +497,54 @@ describe('AuthController (e2e)', () => {
       );
     });
   });
+
+  describe('GET:/reports/own', () => {
+    it('not logged in, FORBIDDEN', async () => {
+      await request(server).get('/reports/own').expect(403);
+    });
+
+    it('no own reports, get empty array, BAD_REQUEST', async () => {
+      const signupResponse = await request(server)
+        .post('/auth/signup')
+        .send({ email: defaultEmail, password: defaultPassword })
+        .expect(201);
+
+      const cookies = signupResponse.get('Set-Cookie');
+      const response = await request(server)
+        .get('/reports/own')
+        .set('Cookie', cookies)
+        .expect(200);
+
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body).toHaveLength(0);
+    });
+
+    it('get all own reports, OK', async () => {
+      const signupResponse = await request(server)
+        .post('/auth/signup')
+        .send({ email: defaultEmail, password: defaultPassword })
+        .expect(201);
+
+      const cookies = signupResponse.get('Set-Cookie');
+
+      await Promise.all([
+        request(server)
+          .post('/reports')
+          .set('Cookie', cookies)
+          .send(getRandomReportData()),
+        request(server)
+          .post('/reports')
+          .set('Cookie', cookies)
+          .send(getRandomReportData()),
+      ]);
+
+      const response = await request(server)
+        .get('/reports/own')
+        .set('Cookie', cookies)
+        .expect(200);
+
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body).toHaveLength(2);
+    });
+  });
 });
