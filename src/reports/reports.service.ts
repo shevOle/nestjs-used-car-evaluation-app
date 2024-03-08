@@ -88,10 +88,13 @@ export class ReportsService {
   }
 
   async checkReport(
-    id: number,
+    _id: number,
     currentser: User,
     appproved: boolean,
   ): Promise<Report> {
+    const id = Number(_id);
+    if (!id) throw new BadRequestException('Id is required');
+
     const report = await this.reportRepository.findOne({ where: { id } });
     if (!report) throw new BadRequestException('Report not found');
 
