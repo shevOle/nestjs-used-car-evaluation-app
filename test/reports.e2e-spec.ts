@@ -547,4 +547,65 @@ describe('AuthController (e2e)', () => {
       expect(response.body).toHaveLength(2);
     });
   });
+
+  describe('GET:/reports/:id', () => {
+    it('not logged in, FORBIDDEN', async () => {
+      await request(server).get('/reports/3').expect(403);
+    });
+
+    it('id is not valid, BAD_REQUEST', async () => {
+      const signupResponse = await request(server)
+        .post('/auth/signup')
+        .send({ email: defaultEmail, password: defaultPassword })
+        .expect(201);
+
+      const cookies = signupResponse.get('Set-Cookie');
+
+      const response = await request(server)
+        .get('/reports/sss')
+        .set('Cookie', cookies)
+        .expect(400);
+
+      expect(response.body.message).toBe('Id is required');
+    });
+
+    it('there is no report with provided id, BAD_REQUEST', async () => {
+      const signupResponse = await request(server)
+        .post('/auth/signup')
+        .send({ email: defaultEmail, password: defaultPassword })
+        .expect(201);
+
+      const cookies = signupResponse.get('Set-Cookie');
+
+      const response = await request(server)
+        .get('/reports/1')
+        .set('Cookie', cookies)
+        .expect(404);
+
+      expect(response.body.message).toBe('Report not found');
+    });
+
+    it('returns a report, OK', async () => {
+      const signupResponse = await request(server)
+        .post('/auth/signup')
+        .send({ email: defaultEmail, password: defaultPassword })
+        .expect(201);
+
+      const cookies = signupResponse.get('Set-Cookie');
+
+      const report = getRandomReportData();
+      await request(server)
+        .post('/reports')
+        .set('Cookie', cookies)
+        .send(report)
+        .expect(201);
+
+      const response = await request(server)
+        .get('/reports/1')
+        .set('Cookie', cookies)
+        .expect(200);
+
+      expect(pick(response.body, Object.keys(report))).toMatchObject(report);
+    });
+  });
 });
