@@ -96,7 +96,7 @@ export class ReportsService {
     if (!id) throw new BadRequestException('Id is required');
 
     const report = await this.reportRepository.findOne({ where: { id } });
-    if (!report) throw new BadRequestException('Report not found');
+    if (!report) throw new NotFoundException('Report not found');
 
     report.updatedByUserId = currentser.id;
     report.status = appproved ? 'approved' : 'rejected';
