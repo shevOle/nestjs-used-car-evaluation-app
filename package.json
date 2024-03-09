@@ -22,7 +22,8 @@
     "test:all": "npm run test && npm run test:e2e",
     "typeorm:generate": "npm run build && npx typeorm-ts-node-commonjs migration:generate -d src/db/data-source.ts -o",
     "typeorm:create": "npx typeorm-ts-node-commonjs migration:create -o",
-    "typeorm:run": "npx typeorm-ts-node-commonjs migration:run -d src/db/data-source.ts"
+    "typeorm:run": "npx typeorm-ts-node-commonjs migration:run -d src/db/data-source.ts",
+    "typeorm:revert": "npx typeorm-ts-node-commonjs migration:revert -d src/db/data-source.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
