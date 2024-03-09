@@ -24,7 +24,7 @@ module.exports = class AddDefaultUsers1710017675468 {
 
     await queryRunner.query(
       `INSERT INTO "user" 
-            ("id", "email", "password", "isAdmin") VALUES ("1", "${DEFAULT_ADMIN_EMAIL}", "${hashedAdminPassword}", "TRUE"), ("2", "${DEFAULT_USER_EMAIL}", "${hashedUserPassword}", "FALSE")`,
+            ("id", "email", "password", "isAdmin") VALUES ("1", "${DEFAULT_ADMIN_EMAIL}", "${hashedAdminPassword}", TRUE), ("2", "${DEFAULT_USER_EMAIL}", "${hashedUserPassword}", FALSE)`,
     );
   }
 
