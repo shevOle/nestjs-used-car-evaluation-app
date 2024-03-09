@@ -1,5 +1,14 @@
 import { randomBytes } from 'crypto';
 import { User } from 'src/db/entities/user.entity';
+import * as dotenv from '@nestjs/config/node_modules/dotenv';
+
+dotenv.config();
+export const {
+  DEFAULT_ADMIN_EMAIL,
+  DEFAULT_ADMIN_PASSWORD,
+  DEFAULT_USER_EMAIL,
+  DEFAULT_USER_PASSWORD,
+} = process.env;
 
 export const defaultEmail = 'email@test.com';
 export const defaultPassword = 'password';

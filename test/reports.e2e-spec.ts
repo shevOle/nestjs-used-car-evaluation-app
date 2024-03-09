@@ -7,11 +7,17 @@ import {
   defaultEmail,
   defaultPassword,
   getRandomReportData,
+  DEFAULT_ADMIN_EMAIL,
+  DEFAULT_ADMIN_PASSWORD,
+  DEFAULT_USER_EMAIL,
+  DEFAULT_USER_PASSWORD,
 } from '../src/common/constants/test.constants';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let server: any;
+  let userCookies: string[];
+  let adminCookies: string[];
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -21,6 +27,19 @@ describe('AuthController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
     server = app.getHttpServer();
+
+    const userLoginResponse = await request(server)
+      .post('/auth/login')
+      .send({ email: DEFAULT_USER_EMAIL, password: DEFAULT_USER_PASSWORD })
+      .expect(200);
+
+    const adminLoginResponse = await request(server)
+      .post('/auth/login')
+      .send({ email: DEFAULT_ADMIN_EMAIL, password: DEFAULT_ADMIN_PASSWORD })
+      .expect(200);
+
+    userCookies = userLoginResponse.get('Set-Cookie');
+    adminCookies = adminLoginResponse.get('Set-Cookie');
   });
 
   describe('POST:/reports', () => {
@@ -504,15 +523,9 @@ describe('AuthController (e2e)', () => {
     });
 
     it('no own reports, get empty array, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .get('/reports/own')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(200);
 
       expect(response.body).toBeInstanceOf(Array);
@@ -520,27 +533,20 @@ describe('AuthController (e2e)', () => {
     });
 
     it('get all own reports, OK', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
-
       await Promise.all([
         request(server)
           .post('/reports')
-          .set('Cookie', cookies)
+          .set('Cookie', userCookies)
           .send(getRandomReportData()),
         request(server)
           .post('/reports')
-          .set('Cookie', cookies)
+          .set('Cookie', userCookies)
           .send(getRandomReportData()),
       ]);
 
       const response = await request(server)
         .get('/reports/own')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(200);
 
       expect(response.body).toBeInstanceOf(Array);
@@ -606,6 +612,106 @@ describe('AuthController (e2e)', () => {
         .expect(200);
 
       expect(pick(response.body, Object.keys(report))).toMatchObject(report);
+    });
+  });
+
+  describe('PATCH:/reports/:id', () => {
+    it('not logged in, FORBIDDEN', async () => {
+      await request(server).patch('/reports/1').expect(403);
+    });
+
+    it('logged in as a regular user, FORBIDDEN', async () => {
+      await request(server)
+        .patch('/reports/1')
+        .set('Cookie', userCookies)
+        .send({ approved: true })
+        .expect(403);
+    });
+
+    it('id is not valid, BAD_REQUEST', async () => {
+      const response = await request(server)
+        .patch('/reports/sss')
+        .set('Cookie', adminCookies)
+        .send({ approved: true })
+        .expect(400);
+
+      expect(response.body.message).toBe('Id is required');
+    });
+
+    it('body does not containe approve property, BAD_REQUEST', async () => {
+      const response = await request(server)
+        .patch('/reports/1')
+        .set('Cookie', adminCookies)
+        .send({ param: 'value' })
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('approved must be a boolean value');
+    });
+
+    it('approve property in body is not valid, BAD_REQUEST', async () => {
+      const response = await request(server)
+        .patch('/reports/1')
+        .set('Cookie', adminCookies)
+        .send({ approve: {} })
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('approved must be a boolean value');
+    });
+
+    it('there is no report with provided id, NOT_FOUND', async () => {
+      const response = await request(server)
+        .patch('/reports/1')
+        .set('Cookie', adminCookies)
+        .send({ approved: true })
+        .expect(404);
+
+      expect(response.body.message).toBe('Report not found');
+    });
+
+    it('approve the report, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      await request(server)
+        .post('/reports')
+        .set('Cookie', userCookies)
+        .send(reportData)
+        .expect(201);
+
+      await request(server)
+        .patch('/reports/1')
+        .set('Cookie', adminCookies)
+        .send({ approved: true })
+        .expect(200);
+
+      const responseWithReport = await request(server)
+        .get('/reports/1')
+        .set('Cookie', userCookies)
+        .expect(200);
+      console.log(responseWithReport.body);
+
+      expect(responseWithReport.body.status).toBe('approved');
+    });
+
+    it('reject the report, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      await request(server)
+        .post('/reports')
+        .set('Cookie', userCookies)
+        .send(reportData)
+        .expect(201);
+
+      await request(server)
+        .patch('/reports/1')
+        .set('Cookie', adminCookies)
+        .send({ approved: false })
+        .expect(200);
+
+      const responseWithReport = await request(server)
+        .get('/reports/1')
+        .set('Cookie', userCookies)
+        .expect(200);
+      console.log(responseWithReport.body);
+
+      expect(responseWithReport.body.status).toBe('rejected');
     });
   });
 });
