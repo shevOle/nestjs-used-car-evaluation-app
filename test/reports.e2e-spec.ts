@@ -254,7 +254,7 @@ describe('AuthController (e2e)', () => {
       );
     });
 
-    it('got request with year less than 1900, BAD_REQUEST', async () => {
+    it('got request with year less than 1990, BAD_REQUEST', async () => {
       const signupResponse = await request(server)
         .post('/auth/signup')
         .send({ email: defaultEmail, password: defaultPassword })
@@ -270,10 +270,10 @@ describe('AuthController (e2e)', () => {
         .send(report)
         .expect(400);
 
-      expect(response.body.message[0]).toBe('year must not be less than 1900');
+      expect(response.body.message[0]).toBe('year must not be less than 1990');
     });
 
-    it('got request with year greater than 2100, BAD_REQUEST', async () => {
+    it('got request with year greater than 2030, BAD_REQUEST', async () => {
       const signupResponse = await request(server)
         .post('/auth/signup')
         .send({ email: defaultEmail, password: defaultPassword })
@@ -290,7 +290,7 @@ describe('AuthController (e2e)', () => {
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'year must not be greater than 2100',
+        'year must not be greater than 2030',
       );
     });
 
@@ -686,7 +686,6 @@ describe('AuthController (e2e)', () => {
         .get('/reports/1')
         .set('Cookie', userCookies)
         .expect(200);
-      console.log(responseWithReport.body);
 
       expect(responseWithReport.body.status).toBe('approved');
     });
@@ -709,9 +708,324 @@ describe('AuthController (e2e)', () => {
         .get('/reports/1')
         .set('Cookie', userCookies)
         .expect(200);
-      console.log(responseWithReport.body);
 
       expect(responseWithReport.body.status).toBe('rejected');
+    });
+  });
+
+  describe('GET:/reports/estimate', () => {
+    it('not logged in, FORBIDDEN', async () => {
+      await request(server).get('/reports/estimate').expect(403);
+    });
+
+    it('model is not provided, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      delete reportData.model;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('Model is obligatory');
+    });
+
+    it('maker is not provided, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      delete reportData.make;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('Maker is obligatory');
+    });
+
+    it('year is not provided, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      delete reportData.year;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('Year is obligatory');
+    });
+
+    it('mileage is not provided, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      delete reportData.mileage;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('Mileage is obligatory');
+    });
+
+    it('latitude is not provided, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      delete reportData.lat;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('Latitude is obligatory');
+    });
+
+    it('longitude is not provided, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      delete reportData.lng;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('Longitude is obligatory');
+    });
+
+    it('couple of propertiies are not provided, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+
+      delete reportData.lng;
+      delete reportData.lat;
+      delete reportData.mileage;
+
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message).toContain('Longitude is obligatory');
+      expect(response.body.message).toContain('Latitude is obligatory');
+      expect(response.body.message).toContain('Mileage is obligatory');
+    });
+
+    it('maker is not valid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.make = [1, 2, 3] as any;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('Maker must be a string');
+    });
+
+    it('model is not valid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.model = [1, 2, 3] as any;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe('Model must be a string');
+    });
+
+    it('mileage is not valid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.mileage = 'kasjsf' as any;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe(
+        'Mileage should be a positive number up to 1000000',
+      );
+    });
+
+    it('year is not valid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.year = 'kasjsf' as any;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe(
+        'Year value must be from 1990 to 2030',
+      );
+    });
+
+    it('latitude is not valid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.lat = 'kasjsf' as any;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe(
+        'Latitude must be a number between -90 and 90',
+      );
+    });
+
+    it('longitude is not valid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.lng = 'kasjsf' as any;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe(
+        'Longitude must be a number between -180 and 180',
+      );
+    });
+
+    it('couple of properties are not valid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.lng = 'kasjsf' as any;
+      reportData.mileage = 'kasjsf' as any;
+      reportData.model = [1, 2, 3] as any;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message).toContain(
+        'Longitude must be a number between -180 and 180',
+      );
+      expect(response.body.message).toContain(
+        'Mileage should be a positive number up to 1000000',
+      );
+      expect(response.body.message).toContain('Model must be a string');
+    });
+
+    it('year value is off grid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.year = 2043;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe(
+        'Year value must be from 1990 to 2030',
+      );
+    });
+
+    it('mileage value is off grid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.mileage = -23;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe(
+        'Mileage should be a positive number up to 1000000',
+      );
+    });
+
+    it('latitude value is off grid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.lat = -120;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe(
+        'Latitude must be a number between -90 and 90',
+      );
+    });
+
+    it('longitude value is off grid, BAD_REQUEST', async () => {
+      const reportData = getRandomReportData();
+      reportData.lng = 200;
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(400);
+
+      expect(response.body.message[0]).toBe(
+        'Longitude must be a number between -180 and 180',
+      );
+    });
+
+    it('no reports are found, OK', async () => {
+      const reportData = getRandomReportData();
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query(reportData)
+        .expect(200);
+
+      expect(response.body.price).toBeNull();
+    });
+
+    it('returns estimate price, OK', async () => {
+      const reportData1 = {
+        make: 'toyota',
+        model: 'corolla',
+        year: 1995,
+        price: 2000,
+        mileage: 500000,
+        lat: 5,
+        lng: 36,
+      };
+
+      const reportData2 = {
+        make: 'toyota',
+        model: 'corolla',
+        year: 1998,
+        price: 5000,
+        mileage: 239000,
+        lat: 12,
+        lng: 28,
+      };
+
+      const reportData3 = {
+        make: 'toyota',
+        model: 'corolla',
+        year: 2003, // will not be included in results
+        price: 7000,
+        mileage: 120000,
+        lat: 10,
+        lng: 30,
+      };
+
+      await request(server)
+        .post('/reports/many/randomstring-kasjfnasklj')
+        .set('Cookie', adminCookies)
+        .send([reportData1, reportData2, reportData3])
+        .expect(201);
+
+      const response = await request(server)
+        .get('/reports/estimate')
+        .set('Cookie', userCookies)
+        .query({
+          make: 'toyota',
+          model: 'corolla',
+          year: 1996,
+          mileage: 300000,
+          lat: 9,
+          lng: 31,
+        })
+        .expect(200);
+
+      expect(response.body.price).toBe(3500);
     });
   });
 });
