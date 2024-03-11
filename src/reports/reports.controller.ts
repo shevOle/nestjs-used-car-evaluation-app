@@ -29,6 +29,7 @@ export class ReportsController {
     return this.reportService.getEstimate(query);
   }
 
+  @UseGuards(AdminAuthGuard)
   @Post('/many/randomstring-kasjfnasklj')
   async createMany(
     @CurrentUser() currentUser: User,
