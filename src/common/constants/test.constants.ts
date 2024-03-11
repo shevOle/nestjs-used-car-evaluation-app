@@ -35,20 +35,20 @@ export const defaultReport = {
 export const getRandomReportData = () => {
   const makers = ['toyota', 'ford', 'honda', 'audi'];
   const models = ['corolla', 'focus', 'civic', 'a6'];
-  const minYear = 1980;
+  const minYear = 1990;
   const maxYear = new Date().getFullYear();
   const maxMileage = 1000000;
   const maxPrice = 1000000;
 
   const getRandomNumber = (maxNumber: number): number =>
-    Math.floor(Math.random() * maxNumber);
+    Math.floor((Math.random() || 0.1) * maxNumber);
 
   return {
     make: makers[getRandomNumber(3)],
     model: models[getRandomNumber(3)],
     year: getRandomNumber(maxYear - minYear) + minYear,
     lat: getRandomNumber(90),
-    lng: getRandomNumber(90),
+    lng: getRandomNumber(180),
     mileage: getRandomNumber(maxMileage),
     price: getRandomNumber(maxPrice),
   };
