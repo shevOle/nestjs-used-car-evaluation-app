@@ -25,8 +25,8 @@ export class CreateReportRequestDto {
   mileage: number;
 
   @IsNumber()
-  @Min(1900)
-  @Max(2100)
+  @Min(1990)
+  @Max(2030)
   year: number;
 
   @IsLongitude()
