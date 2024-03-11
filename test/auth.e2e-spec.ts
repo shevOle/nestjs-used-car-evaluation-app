@@ -64,7 +64,7 @@ describe('AuthController (e2e)', () => {
 
       const user = response.body;
       expect(user).toBeDefined();
-      expect(user).toMatchObject({ id: 1, email: defaultEmail });
+      expect(user).toMatchObject({ id: 3, email: defaultEmail });
     });
   });
 

@@ -43,11 +43,11 @@ describe('AuthController (e2e)', () => {
         .expect(200);
 
       expect(response.body).toBeInstanceOf(Array);
-      expect(response.body).toHaveLength(2);
+      expect(response.body).toHaveLength(4);
 
-      const [user1, user2] = response.body;
-      expect(user1).toMatchObject({ email: defaultEmail, id: 1 });
-      expect(user2).toMatchObject({ email: secondEmail, id: 2 });
+      const [_, __, user1, user2] = response.body;
+      expect(user1).toMatchObject({ email: defaultEmail, id: 3 });
+      expect(user2).toMatchObject({ email: secondEmail, id: 4 });
     });
   });
 
@@ -88,7 +88,7 @@ describe('AuthController (e2e)', () => {
         .set('Cookie', cookies)
         .expect(200);
 
-      expect(response.body).toMatchObject({ id: 2, email: defaultEmail });
+      expect(response.body).toMatchObject({ id: 4, email: defaultEmail });
     });
   });
 
@@ -135,11 +135,11 @@ describe('AuthController (e2e)', () => {
 
       const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
-        .get('/users/1')
+        .get('/users/3')
         .set('Cookie', cookies)
         .expect(200);
 
-      expect(response.body).toMatchObject({ id: 1, email: defaultEmail });
+      expect(response.body).toMatchObject({ id: 3, email: defaultEmail });
     });
   });
 
@@ -192,17 +192,17 @@ describe('AuthController (e2e)', () => {
 
       const cookies = signupResponse.get('Set-Cookie');
       await request(server)
-        .patch('/users/1')
+        .patch('/users/3')
         .set('Cookie', cookies)
         .send({})
         .expect(200)
         .expect({});
 
       const response = await request(server)
-        .get('/users/1')
+        .get('/users/3')
         .set('Cookie', cookies)
         .expect(200);
-      expect(response.body).toMatchObject({ id: 1, email: defaultEmail });
+      expect(response.body).toMatchObject({ id: 3, email: defaultEmail });
     });
 
     it('updates user email, OK', async () => {
