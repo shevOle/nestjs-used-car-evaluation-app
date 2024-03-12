@@ -2,12 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
+import {
+  defaultEmail,
+  defaultPassword,
+  DEFAULT_USER_EMAIL,
+  DEFAULT_USER_PASSWORD,
+} from '../src/common/constants/test.constants';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let server: any;
-  const defaultEmail = 'email@test.com';
-  const defaultPassword = 'password';
+  let userCookies: string[];
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -17,6 +22,13 @@ describe('AuthController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
     server = app.getHttpServer();
+
+    const userLoginResponse = await request(server)
+      .post('/auth/login')
+      .send({ email: DEFAULT_USER_EMAIL, password: DEFAULT_USER_PASSWORD })
+      .expect(200);
+
+    userCookies = userLoginResponse.get('Set-Cookie');
   });
 
   describe('POST:/auth/signup', () => {
@@ -31,14 +43,9 @@ describe('AuthController (e2e)', () => {
     });
 
     it('email is already in use, BAD_REQUEST', async () => {
-      await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
       const response = await request(server)
         .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
+        .send({ email: DEFAULT_USER_EMAIL, password: defaultPassword })
         .expect(400);
 
       expect(response.body.message).toBe('This email is already in use');
@@ -51,20 +58,14 @@ describe('AuthController (e2e)', () => {
     });
 
     it('logged in, returns user, OK', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .get('/auth/whoami')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(200);
 
       const user = response.body;
       expect(user).toBeDefined();
-      expect(user).toMatchObject({ id: 3, email: defaultEmail });
+      expect(user).toMatchObject({ id: 2, email: DEFAULT_USER_EMAIL });
     });
   });
 
@@ -92,14 +93,9 @@ describe('AuthController (e2e)', () => {
     });
 
     it('saves user session, OK', async () => {
-      await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
       const response = await request(server)
         .post('/auth/login')
-        .send({ email: defaultEmail, password: defaultPassword })
+        .send({ email: DEFAULT_USER_EMAIL, password: DEFAULT_USER_PASSWORD })
         .expect(200);
 
       const cookies = response.get('Set-Cookie');
@@ -113,15 +109,9 @@ describe('AuthController (e2e)', () => {
     });
 
     it('logged in, removes user session, OK', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const signUpCookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .post('/auth/logout')
-        .set('Cookie', signUpCookies)
+        .set('Cookie', userCookies)
         .expect(200);
 
       const cookies = response.get('Set-Cookie');
