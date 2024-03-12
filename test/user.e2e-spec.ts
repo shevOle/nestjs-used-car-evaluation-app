@@ -5,8 +5,6 @@ import { AppModule } from '../src/app.module';
 import {
   defaultEmail,
   defaultPassword,
-  DEFAULT_ADMIN_EMAIL,
-  DEFAULT_ADMIN_PASSWORD,
   DEFAULT_USER_EMAIL,
   DEFAULT_USER_PASSWORD,
 } from '../src/common/constants/test.constants';
