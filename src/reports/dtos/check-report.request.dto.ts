@@ -1,6 +1,6 @@
 import { IsBoolean } from 'class-validator';
 
 export class CheckReportRquestDto {
-  @IsBoolean()
+  @IsBoolean({ message: 'Approve property should be a boolean' })
   approved: boolean;
 }

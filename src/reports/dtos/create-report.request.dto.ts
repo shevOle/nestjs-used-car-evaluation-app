@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsString,
   IsNumber,
@@ -5,33 +6,47 @@ import {
   IsLongitude,
   Min,
   Max,
+  IsDefined,
 } from 'class-validator';
 
 export class CreateReportRequestDto {
-  @IsNumber()
-  @Min(0)
-  @Max(1000000)
+  @Transform(({ value }) => parseInt(value))
+  @IsNumber({ allowNaN: false })
+  @Min(0, { message: 'Price should be a positive number up to 1000000' })
+  @Max(1000000, { message: 'Price should be a positive number up to 1000000' })
   price: number;
 
-  @IsString()
+  @IsString({ message: 'Maker must be a string' })
+  @IsDefined({ message: 'Maker is obligatory' })
   make: string;
 
-  @IsString()
+  @IsString({ message: 'Model must be a string' })
+  @IsDefined({ message: 'Model is obligatory' })
   model: string;
 
-  @IsNumber()
-  @Min(0)
-  @Max(1000000)
+  @Transform(({ value }) => parseInt(value))
+  @IsDefined({ message: 'Mileage is obligatory' })
+  @IsNumber({ allowNaN: false })
+  @Min(0, { message: 'Mileage should be a positive number up to 1000000' })
+  @Max(1000000, {
+    message: 'Mileage should be a positive number up to 1000000',
+  })
   mileage: number;
 
-  @IsNumber()
-  @Min(1990)
-  @Max(2030)
+  @Transform(({ value }) => parseInt(value))
+  @IsDefined({ message: 'Year is obligatory' })
+  @IsNumber({ allowNaN: false })
+  @Min(1990, { message: 'Year value must be from 1990 to 2030' })
+  @Max(2030, { message: 'Year value must be from 1990 to 2030' })
   year: number;
 
-  @IsLongitude()
+  @Transform(({ value }) => parseFloat(value))
+  @IsDefined({ message: 'Longitude is obligatory' })
+  @IsLongitude({ message: 'Longitude must be a number between -180 and 180' })
   lng: number;
 
-  @IsLatitude()
+  @Transform(({ value }) => parseFloat(value))
+  @IsDefined({ message: 'Latitude is obligatory' })
+  @IsLatitude({ message: 'Latitude must be a number between -90 and 90' })
   lat: number;
 }
