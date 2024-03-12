@@ -2,12 +2,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
+import {
+  defaultEmail,
+  defaultPassword,
+  DEFAULT_ADMIN_EMAIL,
+  DEFAULT_ADMIN_PASSWORD,
+  DEFAULT_USER_EMAIL,
+  DEFAULT_USER_PASSWORD,
+} from '../src/common/constants/test.constants';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let server: any;
-  const defaultEmail = 'email@test.com';
-  const defaultPassword = 'password';
+  let userCookies: string[];
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -17,6 +24,13 @@ describe('AuthController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
     server = app.getHttpServer();
+
+    const userLoginResponse = await request(server)
+      .post('/auth/login')
+      .send({ email: DEFAULT_USER_EMAIL, password: DEFAULT_USER_PASSWORD })
+      .expect(200);
+
+    userCookies = userLoginResponse.get('Set-Cookie');
   });
 
   describe('GET:/users', () => {
@@ -31,15 +45,14 @@ describe('AuthController (e2e)', () => {
         .send({ email: defaultEmail, password: defaultPassword })
         .expect(201);
 
-      const signupResponse = await request(server)
+      await request(server)
         .post('/auth/signup')
         .send({ email: secondEmail, password: defaultPassword })
         .expect(201);
 
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .get('/users')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(200);
 
       expect(response.body).toBeInstanceOf(Array);
@@ -57,15 +70,9 @@ describe('AuthController (e2e)', () => {
     });
 
     it('no email passed, returns null, OK', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .get('/users?email=')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(200);
 
       expect(response.body).toMatchObject({});
@@ -74,21 +81,15 @@ describe('AuthController (e2e)', () => {
     it('returns user, OK', async () => {
       await request(server)
         .post('/auth/signup')
-        .send({ email: `111-${defaultEmail}`, password: defaultPassword })
-        .expect(201);
-
-      const signupResponse = await request(server)
-        .post('/auth/signup')
         .send({ email: defaultEmail, password: defaultPassword })
         .expect(201);
 
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .get(`/users?email=${defaultEmail}`)
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(200);
 
-      expect(response.body).toMatchObject({ id: 4, email: defaultEmail });
+      expect(response.body).toMatchObject({ id: 3, email: defaultEmail });
     });
   });
 
@@ -98,48 +99,30 @@ describe('AuthController (e2e)', () => {
     });
 
     it('id is not a number, throws an error, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .get('/users/sss')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(400);
 
       expect(response.body.message).toBe('Id must be a positive number');
     });
 
     it('user is not found, throws an error, NOT_FOUND', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .get('/users/4')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(404);
 
       expect(response.body.message).toBe('User not found');
     });
 
     it('returns user, OK', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
-        .get('/users/3')
-        .set('Cookie', cookies)
+        .get('/users/2')
+        .set('Cookie', userCookies)
         .expect(200);
 
-      expect(response.body).toMatchObject({ id: 3, email: defaultEmail });
+      expect(response.body).toMatchObject({ id: 2, email: DEFAULT_USER_EMAIL });
     });
   });
 
@@ -153,15 +136,9 @@ describe('AuthController (e2e)', () => {
     });
 
     it('id is not a number, throws an error, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .patch('/users/sss')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send({ email: newEmail })
         .expect(400);
 
@@ -169,15 +146,9 @@ describe('AuthController (e2e)', () => {
     });
 
     it('user is not found, throws an error, NOT_FOUND', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
-        .patch('/users/4')
-        .set('Cookie', cookies)
+        .patch('/users/7')
+        .set('Cookie', userCookies)
         .send({ email: newEmail })
         .expect(404);
 
@@ -185,45 +156,34 @@ describe('AuthController (e2e)', () => {
     });
 
     it('empty update object, nothing is changed, OK', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       await request(server)
-        .patch('/users/3')
-        .set('Cookie', cookies)
+        .patch('/users/2')
+        .set('Cookie', userCookies)
         .send({})
         .expect(200)
         .expect({});
 
       const response = await request(server)
-        .get('/users/3')
-        .set('Cookie', cookies)
+        .get('/users/2')
+        .set('Cookie', userCookies)
         .expect(200);
-      expect(response.body).toMatchObject({ id: 3, email: defaultEmail });
+
+      expect(response.body).toMatchObject({ id: 2, email: DEFAULT_USER_EMAIL });
     });
 
     it('updates user email, OK', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       await request(server)
-        .patch('/users/1')
-        .set('Cookie', cookies)
+        .patch('/users/2')
+        .set('Cookie', userCookies)
         .send({ email: newEmail })
         .expect(200)
         .expect({});
 
       const response = await request(server)
-        .get('/users/1')
-        .set('Cookie', cookies)
+        .get('/users/2')
+        .set('Cookie', userCookies)
         .expect(200);
-      expect(response.body).toMatchObject({ id: 1, email: newEmail });
+      expect(response.body).toMatchObject({ id: 2, email: newEmail });
     });
   });
 
@@ -233,49 +193,34 @@ describe('AuthController (e2e)', () => {
     });
 
     it('id is not a number, throws an error, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .delete('/users/sss')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(400);
 
       expect(response.body.message).toBe('Id must be a positive number');
     });
 
     it('user is not found, throws an error, NOT_FOUND', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const response = await request(server)
         .delete('/users/4')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(404);
 
       expect(response.body.message).toBe('User not found');
     });
 
     it('removes user, NO_CONTENT', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       await request(server)
         .delete('/users/1')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(204)
         .expect({});
 
-      await request(server).get('/users/1').set('Cookie', cookies).expect(404);
+      await request(server)
+        .get('/users/1')
+        .set('Cookie', userCookies)
+        .expect(404);
     });
   });
 });
