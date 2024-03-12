@@ -4,8 +4,6 @@ import * as request from 'supertest';
 import { pick } from 'lodash';
 import { AppModule } from '../src/app.module';
 import {
-  defaultEmail,
-  defaultPassword,
   getRandomReportData,
   DEFAULT_ADMIN_EMAIL,
   DEFAULT_ADMIN_PASSWORD,
@@ -48,204 +46,144 @@ describe('AuthController (e2e)', () => {
     });
 
     it('got request w/o model, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       delete report.model;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
-      expect(response.body.message[0]).toBe('model must be a string');
+      expect(response.body.message[0]).toBe('Model is obligatory');
     });
 
     it('got request w/o maker, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       delete report.make;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
-      expect(response.body.message[0]).toBe('make must be a string');
+      expect(response.body.message[0]).toBe('Maker is obligatory');
     });
 
     it('got request with mileage greater than 1000000, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.mileage = 1000000000;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'mileage must not be greater than 1000000',
+        'Mileage should be a positive number up to 1000000',
       );
     });
 
     it('got request with mileage less than 0, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.mileage = -12;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
-      expect(response.body.message[0]).toBe('mileage must not be less than 0');
+      expect(response.body.message[0]).toBe(
+        'Mileage should be a positive number up to 1000000',
+      );
     });
 
     it('got request w/o mileage, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       delete report.mileage;
 
-      await request(server)
+      const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
+
+      expect(response.body.message[0]).toBe('Mileage is obligatory');
     });
 
     it('got request with invalid mileage value, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.mileage = 'aksijf' as any;
 
       await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
     });
 
     it('got request with price less than 0, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.price = -12;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
-      expect(response.body.message[0]).toBe('price must not be less than 0');
+      expect(response.body.message[0]).toBe(
+        'Price should be a positive number up to 1000000',
+      );
     });
 
     it('got request with price greater than 1000000, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.price = 1000001;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'price must not be greater than 1000000',
+        'Price should be a positive number up to 1000000',
       );
     });
 
     it('got request w/o price, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       delete report.price;
 
       await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
     });
 
     it('got request with invalid price value, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.price = 'aksijf' as any;
 
       await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
     });
 
     it('got year that is greater that current year, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.year = 2030;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
@@ -255,257 +193,181 @@ describe('AuthController (e2e)', () => {
     });
 
     it('got request with year less than 1990, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.year = 1899;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
-      expect(response.body.message[0]).toBe('year must not be less than 1990');
+      expect(response.body.message[0]).toBe(
+        'Year value must be from 1990 to 2030',
+      );
     });
 
     it('got request with year greater than 2030, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.year = 2101;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'year must not be greater than 2030',
+        'Year value must be from 1990 to 2030',
       );
     });
 
     it('got request w/o year, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       delete report.year;
 
       await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
     });
 
     it('got request with invalid year value, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.year = 'aksijf' as any;
 
       await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
     });
 
     it('got request with latitude greater than 90, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.lat = 91;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'lat must be a latitude string or number',
+        'Latitude must be a number between -90 and 90',
       );
     });
 
     it('got request with latitude less than -90, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.lat = -91;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'lat must be a latitude string or number',
+        'Latitude must be a number between -90 and 90',
       );
     });
 
     it('got request with invalid lat value, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.lat = 'ksj' as any;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'lat must be a latitude string or number',
+        'Latitude must be a number between -90 and 90',
       );
     });
 
     it('got request w/o latitude, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       delete report.lat;
 
       await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
     });
 
     it('got request with longitude greater than 180, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.lng = 181;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'lng must be a longitude string or number',
+        'Longitude must be a number between -180 and 180',
       );
     });
 
     it('got request with longitude less than -180, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.lng = -181;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'lng must be a longitude string or number',
+        'Longitude must be a number between -180 and 180',
       );
     });
 
     it('got request with invalid lng value, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       report.lng = 'ksj' as any;
 
       const response = await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
 
       expect(response.body.message[0]).toBe(
-        'lng must be a longitude string or number',
+        'Longitude must be a number between -180 and 180',
       );
     });
 
     it('got request w/o longitude, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
       delete report.lng;
 
       await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(400);
     });
 
     it('creates a report, CREATED', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
       const report = getRandomReportData();
 
       await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(201);
 
       const createdReport = await request(server)
         .get('/reports/own')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(200);
 
       expect(createdReport.body).toBeInstanceOf(Array);
@@ -560,55 +422,34 @@ describe('AuthController (e2e)', () => {
     });
 
     it('id is not valid, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
-
       const response = await request(server)
         .get('/reports/sss')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(400);
 
       expect(response.body.message).toBe('Id is required');
     });
 
     it('there is no report with provided id, BAD_REQUEST', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
-
       const response = await request(server)
         .get('/reports/1')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(404);
 
       expect(response.body.message).toBe('Report not found');
     });
 
     it('returns a report, OK', async () => {
-      const signupResponse = await request(server)
-        .post('/auth/signup')
-        .send({ email: defaultEmail, password: defaultPassword })
-        .expect(201);
-
-      const cookies = signupResponse.get('Set-Cookie');
-
       const report = getRandomReportData();
       await request(server)
         .post('/reports')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .send(report)
         .expect(201);
 
       const response = await request(server)
         .get('/reports/1')
-        .set('Cookie', cookies)
+        .set('Cookie', userCookies)
         .expect(200);
 
       expect(pick(response.body, Object.keys(report))).toMatchObject(report);
@@ -645,7 +486,9 @@ describe('AuthController (e2e)', () => {
         .send({ param: 'value' })
         .expect(400);
 
-      expect(response.body.message[0]).toBe('approved must be a boolean value');
+      expect(response.body.message[0]).toBe(
+        'Approve property should be a boolean',
+      );
     });
 
     it('approve property in body is not valid, BAD_REQUEST', async () => {
@@ -655,7 +498,9 @@ describe('AuthController (e2e)', () => {
         .send({ approve: {} })
         .expect(400);
 
-      expect(response.body.message[0]).toBe('approved must be a boolean value');
+      expect(response.body.message[0]).toBe(
+        'Approve property should be a boolean',
+      );
     });
 
     it('there is no report with provided id, NOT_FOUND', async () => {
