@@ -9,6 +9,7 @@ import {
   UseGuards,
   Res,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Response as IResponse } from 'express';
 import { ReportsService } from './reports.service';
 import { CreateReportRequestDto } from './dtos/create-report.request.dto';
@@ -19,6 +20,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '../db/entities/user.entity';
 import { AdminAuthGuard } from '../common/guards/admin-auth.guard';
 
+@ApiTags('Reports')
 @UseGuards(AuthGuard)
 @Controller('reports')
 export class ReportsController {

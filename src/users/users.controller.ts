@@ -10,6 +10,7 @@ import {
   BadRequestException,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Response as IRespone } from 'express';
 import { UsersService } from './users.service';
 import { UpdateUserRequestDto } from './dtos/update-user.request.dto';
@@ -17,6 +18,7 @@ import { PublicUserDto } from './dtos/public-user.dto';
 import { Serialize } from '../common/interceptors/serialize.interceptor';
 import { AuthGuard } from '../common/guards/auth.guard';
 
+@ApiTags('Users')
 @UseGuards(AuthGuard)
 @Serialize(PublicUserDto)
 @Controller('users')

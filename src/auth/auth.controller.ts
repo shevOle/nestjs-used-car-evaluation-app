@@ -9,6 +9,7 @@ import {
   InternalServerErrorException,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Response as IResponse } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserRequestDto } from './dtos/create-user.request.dto';
@@ -19,6 +20,7 @@ import { AuthGuard } from '../common/guards/auth.guard';
 import { Serialize } from '../common/interceptors/serialize.interceptor';
 import { PublicUserDto } from '../users/dtos/public-user.dto';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
