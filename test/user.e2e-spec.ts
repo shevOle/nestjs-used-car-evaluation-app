@@ -9,7 +9,7 @@ import {
   DEFAULT_USER_PASSWORD,
 } from '../src/common/constants/test.constants';
 
-describe('AuthController (e2e)', () => {
+describe('UsersController (e2e)', () => {
   let app: INestApplication;
   let server: any;
   let userCookies: string[];

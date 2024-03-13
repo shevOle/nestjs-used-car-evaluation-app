@@ -11,7 +11,7 @@ import {
   DEFAULT_USER_PASSWORD,
 } from '../src/common/constants/test.constants';
 
-describe('AuthController (e2e)', () => {
+describe('ReportsController (e2e)', () => {
   let app: INestApplication;
   let server: any;
   let userCookies: string[];
@@ -852,7 +852,7 @@ describe('AuthController (e2e)', () => {
       };
 
       await request(server)
-        .post('/reports/man')
+        .post('/reports/many')
         .set('Cookie', adminCookies)
         .send([reportData1, reportData2, reportData3])
         .expect(201);
