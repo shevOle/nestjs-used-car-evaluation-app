@@ -30,7 +30,7 @@ export class ReportsController {
   }
 
   @UseGuards(AdminAuthGuard)
-  @Post('/many/randomstring-kasjfnasklj')
+  @Post('/many')
   async createMany(
     @CurrentUser() currentUser: User,
     @Body() body: CreateReportRequestDto[],
