@@ -852,7 +852,7 @@ describe('AuthController (e2e)', () => {
       };
 
       await request(server)
-        .post('/reports/many/randomstring-kasjfnasklj')
+        .post('/reports/man')
         .set('Cookie', adminCookies)
         .send([reportData1, reportData2, reportData3])
         .expect(201);
