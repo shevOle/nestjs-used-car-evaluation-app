@@ -20,6 +20,7 @@ export const defaultUser: User = {
   password: defaultPassword,
   isAdmin: false,
   reports: [],
+  profilePicture: '',
 };
 
 export const defaultReport = {

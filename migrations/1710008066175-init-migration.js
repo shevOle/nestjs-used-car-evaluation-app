@@ -2,7 +2,7 @@ module.exports = class InitMigration1710008066175 {
   async up(queryRunner) {
     await queryRunner.query(
       `CREATE TABLE "user" 
-      ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar NOT NULL, "password" varchar NOT NULL, "isAdmin" boolean NOT NULL DEFAULT (0))`,
+      ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar NOT NULL, "password" varchar NOT NULL, "isAdmin" boolean NOT NULL DEFAULT (0), "profilePicture" varchar NOT NULL)`,
     );
 
     await queryRunner.query(
