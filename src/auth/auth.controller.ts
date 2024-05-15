@@ -39,7 +39,7 @@ export class AuthController {
     @Session() session: any,
   ) {
     try {
-      const user = await this.authService.singup(body.email, body.password);
+      const user = await this.authService.signup(body);
       session.userId = user.id;
       return res.sendStatus(201);
     } catch (err) {

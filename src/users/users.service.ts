@@ -29,13 +29,17 @@ export class UsersService {
     return this.userRepository.find();
   }
 
-  async createUser(email: string, password: string) {
+  async createUser(email: string, password: string, profilePicture: string) {
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
       throw new BadRequestException('User with this email already exists');
     }
 
-    const user = this.userRepository.create({ email, password });
+    const user = this.userRepository.create({
+      email,
+      password,
+      profilePicture,
+    });
     return this.userRepository.save(user);
   }
 

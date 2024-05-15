@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, MinLength } from 'class-validator';
+import { IsString, IsEmail, MinLength, IsNotEmpty } from 'class-validator';
 
 export class CreateUserRequestDto {
   @ApiProperty({
@@ -15,4 +15,11 @@ export class CreateUserRequestDto {
   @IsString({ message: 'Password should be a string' })
   @MinLength(3, { message: 'Pasword should have at least 3 symbols' })
   password: string;
+
+  @ApiProperty({
+    description: 'Profile picture for users',
+  })
+  @IsString()
+  @IsNotEmpty()
+  profilePicture: string;
 }
