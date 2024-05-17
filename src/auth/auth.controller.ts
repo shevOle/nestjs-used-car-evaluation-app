@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Response,
-  Session,
   HttpException,
   InternalServerErrorException,
   UseGuards,
@@ -36,11 +35,10 @@ export class AuthController {
   async signupUser(
     @Body() body: CreateUserRequestDto,
     @Response() res: IResponse,
-    @Session() session: any,
   ) {
     try {
-      const user = await this.authService.signup(body);
-      session.userId = user.id;
+      const token = await this.authService.signup(body);
+      res.cookie('token', token);
       return res.sendStatus(201);
     } catch (err) {
       if (err instanceof HttpException) throw err;
@@ -52,17 +50,16 @@ export class AuthController {
   async loginUser(
     @Body() body: LoginUserRequestDto,
     @Response() res: IResponse,
-    @Session() session: any,
   ) {
-    const user = await this.authService.login(body.email, body.password);
-    session.userId = user.id;
+    const token = await this.authService.login(body.email, body.password);
+    res.cookie('token', token);
     return res.sendStatus(200);
   }
 
   @UseGuards(AuthGuard)
   @Post('/logout')
-  logOut(@Session() session: any, @Response() res: IResponse) {
-    session.userId = null;
+  logOut(@Response() res: IResponse) {
+    res.clearCookie('token');
     return res.sendStatus(200);
   }
 }
