@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UtilsModule } from './utils/utils.module';
 import { AppController } from './app.controller';
 import { join } from 'path';
+import { AuthMiddleware } from './common/middlewares/auth.middleware';
 
 const typeOrmConfig = require(join(__dirname, '..', 'ormconfig.js'));
 
@@ -30,4 +31,8 @@ const typeOrmConfig = require(join(__dirname, '..', 'ormconfig.js'));
   ],
   controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('*');
+  }
+}

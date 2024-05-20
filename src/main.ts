@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -9,6 +10,8 @@ async function bootstrap() {
     credentials: true,
     origin: 'http://localhost:4200',
   });
+
+  app.use(cookieParser());
 
   const config = new DocumentBuilder()
     .setTitle('User car evaluation tool')
