@@ -60,6 +60,6 @@ export class AuthController {
   @Post('/logout')
   logOut(@Response() res: IResponse) {
     res.clearCookie('token');
-    return res.sendStatus(200);
+    return res.sendStatus(204);
   }
 }
