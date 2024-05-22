@@ -7,7 +7,7 @@ module.exports = class InitMigration1710008066175 {
 
     await queryRunner.query(
       `CREATE TABLE "report" 
-        ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "price" integer NOT NULL, "make" varchar NOT NULL, "model" varchar NOT NULL, "mileage" integer NOT NULL, "year" integer NOT NULL, "lng" integer NOT NULL, "lat" integer NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedByUserId" integer, "status" varchar CHECK( "status" IN ('new','approved','rejected') ) NOT NULL DEFAULT ('new'), "userId" integer, CONSTRAINT "FK_e347c56b008c2057c9887e230aa" FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION)`,
+      ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "price" integer NOT NULL, "make" varchar NOT NULL, "model" varchar NOT NULL, "mileage" integer NOT NULL, "year" integer NOT NULL, "lng" integer NOT NULL, "lat" integer NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedByUserId" integer, "status" varchar CHECK( "status" IN ('new','approved','rejected') ) NOT NULL DEFAULT ('new'), "userId" integer, "submittedByUserId" integer NOT NULL, "description" varchar NOT NULL, CONSTRAINT "FK_e347c56b008c2057c9887e230aa" FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION)`,
     );
   }
 

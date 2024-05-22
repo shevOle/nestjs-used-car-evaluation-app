@@ -43,9 +43,15 @@ export class Report {
   @Column({ nullable: true })
   updatedByUserId: number;
 
+  @Column({ nullable: false })
+  submittedByUserId: number;
+
   @Column({ enum: ['new', 'approved', 'rejected'], default: 'new' })
   status: string;
 
   @ManyToOne(() => User, (user) => user.reports)
   user: User;
+
+  @Column()
+  description: string;
 }

@@ -81,4 +81,21 @@ export class CreateReportRequestDto {
   @IsDefined({ message: 'Latitude is obligatory' })
   @IsLatitude({ message: 'Latitude must be a number between -90 and 90' })
   lat: number;
+
+  @ApiProperty({
+    description: 'Description for a report',
+    default: '',
+  })
+  @IsString({ message: 'Description must be a string' })
+  description: string;
+
+  @ApiProperty({
+    description: 'Id of the report creator',
+    minimum: 0,
+  })
+  @Transform(({ value }) => parseInt(value))
+  @IsDefined({ message: 'User ID is obligatory' })
+  @IsNumber({ allowNaN: false })
+  @Min(0, { message: 'User ID should be poitive' })
+  submittedByUserId: number;
 }
