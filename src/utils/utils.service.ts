@@ -42,6 +42,7 @@ export class UtilsService {
 
   async prepareToken(user: User): Promise<string> {
     return this.signJWT({
+      id: user.id,
       email: user.email,
       isAdmin: user.isAdmin,
       profilePicture: user.profilePicture,
