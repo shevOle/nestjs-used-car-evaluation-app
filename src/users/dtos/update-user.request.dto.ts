@@ -8,4 +8,8 @@ export class UpdateUserRequestDto {
   @IsString()
   @IsOptional()
   password: string;
+
+  @IsString()
+  @IsOptional()
+  profilePicture?: string;
 }
