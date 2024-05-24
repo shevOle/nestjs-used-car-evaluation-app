@@ -17,13 +17,17 @@ import { UpdateUserRequestDto } from './dtos/update-user.request.dto';
 import { PublicUserDto } from './dtos/public-user.dto';
 import { Serialize } from '../common/interceptors/serialize.interceptor';
 import { AuthGuard } from '../common/guards/auth.guard';
+import { UtilsService } from 'src/utils/utils.service';
 
 @ApiTags('Users')
 @UseGuards(AuthGuard)
 @Serialize(PublicUserDto)
 @Controller('users')
 export class UsersController {
-  constructor(private userService: UsersService) {}
+  constructor(
+    private userService: UsersService,
+    private utilsService: UtilsService,
+  ) {}
 
   @Get()
   findUsers(@Query('email') email?: string) {
@@ -50,7 +54,10 @@ export class UsersController {
     if (!parsedId || parsedId < 1) {
       throw new BadRequestException('Id must be a positive number');
     }
-    await this.userService.update(parsedId, body);
+    const user = await this.userService.update(parsedId, body);
+    const token = await this.utilsService.prepareToken(user);
+
+    res.cookie('token', token);
 
     return res.sendStatus(200);
   }
