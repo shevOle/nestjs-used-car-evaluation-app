@@ -26,6 +26,15 @@ import { AdminAuthGuard } from '../common/guards/admin-auth.guard';
 export class ReportsController {
   constructor(private reportService: ReportsService) {}
 
+  @Get()
+  getAll(
+    @Query('page') page: number,
+    @Query('perPage') perPage: number,
+    @Query('limit') limit: number,
+  ) {
+    return this.reportService.getAll({ page, perPage, limit });
+  }
+
   @Get('/estimate')
   priceEstimate(@Query() query: GetEstimateRequestDto) {
     return this.reportService.getEstimate(query);

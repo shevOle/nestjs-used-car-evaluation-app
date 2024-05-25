@@ -48,6 +48,12 @@ export class ReportsService {
     return report;
   }
 
+  getAll(options: { page: number; perPage: number; limit: number }) {
+    const take = options.limit;
+    const skip = options.page * options.perPage || 0;
+    return this.reportRepository.find({ take, skip });
+  }
+
   async getEstimate(params: GetEstimateRequestDto): Promise<{ price: number }> {
     const { make, model } = params || {};
     const mileage = Number(params?.mileage);
