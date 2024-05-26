@@ -8,6 +8,7 @@ import {
   Body,
   UseGuards,
   Res,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response as IResponse } from 'express';
@@ -31,8 +32,18 @@ export class ReportsController {
     @Query('page') page: number,
     @Query('perPage') perPage: number,
     @Query('limit') limit: number,
+    @Query('make') make?: string,
+    @Query('model') model?: string,
+    @Query('year') year?: number,
   ) {
-    return this.reportService.getAll({ page, perPage, limit });
+    return this.reportService.getReports({
+      page,
+      perPage,
+      limit,
+      make,
+      model,
+      year,
+    });
   }
 
   @Get('/estimate')

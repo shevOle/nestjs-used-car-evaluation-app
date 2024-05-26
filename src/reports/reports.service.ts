@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { omitBy, isEmpty } from 'lodash';
 import { CreateReportRequestDto } from './dtos/create-report.request.dto';
 import { GetEstimateRequestDto } from './dtos/get-estimate.request.dto';
 import { Report } from '../db/entities/report.entity';
@@ -48,10 +49,18 @@ export class ReportsService {
     return report;
   }
 
-  getAll(options: { page: number; perPage: number; limit: number }) {
+  getReports(
+    options: Partial<Report> & { page: number; perPage: number; limit: number },
+  ) {
+    const reportFilters = omitBy(
+      options,
+      (el) =>
+        ['page', 'perPage', 'limit'].includes(el?.toString()) || isEmpty(el),
+    );
+    console.log(reportFilters);
     const take = options.limit;
     const skip = options.page * options.perPage || 0;
-    return this.reportRepository.find({ take, skip });
+    return this.reportRepository.find({ take, skip, where: reportFilters });
   }
 
   async getEstimate(params: GetEstimateRequestDto): Promise<{ price: number }> {
