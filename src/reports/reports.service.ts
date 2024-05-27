@@ -57,7 +57,7 @@ export class ReportsService {
       (el) =>
         ['page', 'perPage', 'limit'].includes(el?.toString()) || isEmpty(el),
     );
-    console.log(reportFilters);
+
     const take = options.limit;
     const skip = options.page * options.perPage || 0;
     return this.reportRepository.find({ take, skip, where: reportFilters });

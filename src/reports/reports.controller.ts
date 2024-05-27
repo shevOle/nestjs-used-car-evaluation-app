@@ -8,7 +8,6 @@ import {
   Body,
   UseGuards,
   Res,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response as IResponse } from 'express';
