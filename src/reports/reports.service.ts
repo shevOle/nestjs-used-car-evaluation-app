@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { omitBy, isEmpty } from 'lodash';
 import { CreateReportRequestDto } from './dtos/create-report.request.dto';
 import { GetEstimateRequestDto } from './dtos/get-estimate.request.dto';
@@ -63,30 +63,53 @@ export class ReportsService {
     return this.reportRepository.find({ take, skip, where: reportFilters });
   }
 
-  async getEstimate(params: GetEstimateRequestDto): Promise<{ price: number }> {
-    const { make, model } = params || {};
-    const mileage = Number(params?.mileage);
-    const year = Number(params?.year);
-    const lat = Number(params?.lat);
-    const lng = Number(params?.lng);
+  async getEstimate(
+    params: GetEstimateRequestDto,
+  ): Promise<{ reports: Report[]; averagePrice: number }> {
+    try {
+      const { make, model } = params || {};
+      const mileage = Number(params?.mileage);
+      const year = Number(params?.year);
+      const lat = Number(params?.lat);
+      const lng = Number(params?.lng);
 
-    if ([make, model, mileage, year, lat, lng].some((v) => !v)) {
-      throw new BadRequestException(
-        'You have to provide make, model, mileage, year and your coordinates to get a precise report',
-      );
+      if (
+        [make, model].some((v) => !v) ||
+        [mileage, year, lat, lng].some((v) => Number.isNaN(v))
+      ) {
+        throw new BadRequestException(
+          'You have to provide make, model, mileage, year and your coordinates to get a precise report',
+        );
+      }
+
+      const { price: averagePrice } = await this.reportRepository
+        .createQueryBuilder()
+        .select('AVG(price)', 'price')
+        .where('make = :make', { make })
+        .andWhere('model = :model', { model })
+        .andWhere('year - :year BETWEEN -3 AND 3', { year })
+        .andWhere('lat - :lat BETWEEN -5 AND 5', { lat })
+        .andWhere('lng - :lng BETWEEN -5 AND 5', { lng })
+        .orderBy('ABS(mileage - :mileage)', 'ASC')
+        .setParameters({ mileage })
+        .getRawOne();
+
+      const reports = await this.reportRepository
+        .createQueryBuilder()
+        .where('make = :make', { make })
+        .andWhere('model = :model', { model })
+        .andWhere('year - :year BETWEEN -3 AND 3', { year })
+        .andWhere('lat - :lat BETWEEN -5 AND 5', { lat })
+        .andWhere('lng - :lng BETWEEN -5 AND 5', { lng })
+        .orderBy('ABS(mileage - :mileage)', 'ASC')
+        .setParameters({ mileage })
+        .getMany();
+
+      return { reports, averagePrice };
+    } catch (err) {
+      console.error('Error during getting report estimate', err);
+      console.log('Query params: ', params);
     }
-
-    return this.reportRepository
-      .createQueryBuilder()
-      .select('AVG(price)', 'price')
-      .where('make = :make', { make })
-      .andWhere('model = :model', { model })
-      .andWhere('year - :year BETWEEN -3 AND 3', { year })
-      .andWhere('lat - :lat BETWEEN -5 AND 5', { lat })
-      .andWhere('lng - :lng BETWEEN -5 AND 5', { lng })
-      .orderBy('ABS(mileage - :mileage)', 'ASC')
-      .setParameters({ mileage })
-      .getRawOne();
   }
 
   async create(
