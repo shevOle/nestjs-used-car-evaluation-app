@@ -49,18 +49,34 @@ export class ReportsService {
     return report;
   }
 
+  getReports(options: Partial<Report>): Promise<Report[]>;
   getReports(
     options: Partial<Report> & { page: number; perPage: number; limit: number },
-  ) {
+  ): Promise<Report[]>;
+  getReports(
+    options: Partial<Report> & {
+      page?: number;
+      perPage?: number;
+      limit?: number;
+    },
+  ): Promise<Report[]> {
     const reportFilters = omitBy(
       options,
       (el) =>
         ['page', 'perPage', 'limit'].includes(el?.toString()) || isEmpty(el),
     );
 
-    const take = options.limit;
-    const skip = options.page * options.perPage || 0;
-    return this.reportRepository.find({ take, skip, where: reportFilters });
+    const queryParams: FindManyOptions<Report> = { where: reportFilters };
+
+    if (options.limit) {
+      queryParams.take = options.limit;
+    }
+
+    if (options.page && options.perPage) {
+      queryParams.skip = options.page * options.perPage;
+    }
+
+    return this.reportRepository.find(queryParams);
   }
 
   async getEstimate(
