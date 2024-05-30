@@ -19,6 +19,7 @@ import { AuthGuard } from '../common/guards/auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '../db/entities/user.entity';
 import { AdminAuthGuard } from '../common/guards/admin-auth.guard';
+import { GetReportsRequestDto } from './dtos/get-reports-request.dto';
 
 @ApiTags('Reports')
 @UseGuards(AuthGuard)
@@ -27,22 +28,8 @@ export class ReportsController {
   constructor(private reportService: ReportsService) {}
 
   @Get()
-  getAll(
-    @Query('page') page: number,
-    @Query('perPage') perPage: number,
-    @Query('limit') limit: number,
-    @Query('make') make?: string,
-    @Query('model') model?: string,
-    @Query('year') year?: number,
-  ) {
-    return this.reportService.getReports({
-      page,
-      perPage,
-      limit,
-      make,
-      model,
-      year,
-    });
+  getAll(@Query() query: GetReportsRequestDto) {
+    return this.reportService.getReports(query);
   }
 
   @Get('/estimate')
