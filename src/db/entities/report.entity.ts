@@ -8,6 +8,12 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
+export enum ReportStatuses {
+  NEW = 'new',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
+
 @Entity()
 export class Report {
   @PrimaryGeneratedColumn()
@@ -46,7 +52,7 @@ export class Report {
   @Column({ nullable: false })
   submittedByUserId: number;
 
-  @Column({ enum: ['new', 'approved', 'rejected'], default: 'new' })
+  @Column({ enum: ReportStatuses, default: ReportStatuses.NEW })
   status: string;
 
   @ManyToOne(() => User, (user) => user.reports)
