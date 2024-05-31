@@ -7,6 +7,7 @@ import {
   Max,
   IsOptional,
   IsEnum,
+  ValidateIf,
 } from 'class-validator';
 import { ReportStatuses } from '../../db/entities/report.entity';
 
@@ -44,6 +45,7 @@ export class GetReportsRequestDto {
   @ApiProperty({
     description: 'What is the model of the car',
   })
+  @ValidateIf((_, v) => !!v)
   @IsString({ message: 'Model must be a string' })
   @IsOptional()
   model: string;
@@ -51,6 +53,7 @@ export class GetReportsRequestDto {
   @ApiProperty({
     description: 'What is the model of the car',
   })
+  @ValidateIf((_, v) => !!v)
   @IsString({ message: 'Manufacturer must be a string' })
   @IsOptional()
   make: string;
@@ -58,8 +61,9 @@ export class GetReportsRequestDto {
   @ApiProperty({
     description: 'Status of the needed reports',
   })
+  @ValidateIf((_, v) => !!v)
   @IsEnum(ReportStatuses, {
-    message: 'Status should be one of: new, approved, rejected',
+    message: 'Invalid status value',
   })
   @IsOptional()
   status: string;
@@ -69,6 +73,7 @@ export class GetReportsRequestDto {
     minimum: 1990,
     maximum: 2030,
   })
+  @ValidateIf((_, v) => !!v)
   @Transform(({ value }) => parseInt(value))
   @IsNumber({ allowNaN: false })
   @Min(1990, { message: 'Year value must be from 1990 to 2030' })
