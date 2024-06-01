@@ -11,6 +11,12 @@ import { GetEstimateRequestDto } from './dtos/get-estimate.request.dto';
 import { Report } from '../db/entities/report.entity';
 import { User } from '../db/entities/user.entity';
 
+interface IPaginationOptions {
+  page?: number;
+  perPage?: number;
+  limit?: number;
+}
+
 @Injectable()
 export class ReportsService {
   constructor(
@@ -50,16 +56,8 @@ export class ReportsService {
   }
 
   getReports(options: Partial<Report>): Promise<Report[]>;
-  getReports(
-    options: Partial<Report> & { page: number; perPage: number; limit: number },
-  ): Promise<Report[]>;
-  getReports(
-    options: Partial<Report> & {
-      page?: number;
-      perPage?: number;
-      limit?: number;
-    },
-  ): Promise<Report[]> {
+  getReports(options: Partial<Report> & IPaginationOptions): Promise<Report[]>;
+  getReports(options: Partial<Report> & IPaginationOptions): Promise<Report[]> {
     const reportFilters = omitBy(
       options,
       (el) =>
