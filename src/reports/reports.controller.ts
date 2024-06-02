@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response as IResponse } from 'express';
+import { omit } from 'lodash';
 import { ReportsService } from './reports.service';
 import { CreateReportRequestDto } from './dtos/create-report.request.dto';
 import { CheckReportRquestDto } from './dtos/check-report.request.dto';
@@ -29,7 +30,15 @@ export class ReportsController {
 
   @Get()
   getAll(@Query() query: GetReportsRequestDto) {
-    return this.reportService.getReports(query);
+    const { page = 0, perPage } = query;
+    const filters = omit(query, ['limit', 'page', 'perPage']);
+
+    if (Number.isInteger(perPage)) {
+      const paginationOptions = { take: perPage, skip: page * perPage };
+      return this.reportService.getReports(filters, paginationOptions);
+    }
+
+    return this.reportService.getReports(filters);
   }
 
   @Get('/estimate')

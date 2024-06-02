@@ -12,9 +12,8 @@ import { Report } from '../db/entities/report.entity';
 import { User } from '../db/entities/user.entity';
 
 interface IPaginationOptions {
-  page?: number;
-  perPage?: number;
-  limit?: number;
+  take?: number;
+  skip?: number;
 }
 
 @Injectable()
@@ -55,26 +54,29 @@ export class ReportsService {
     return report;
   }
 
-  getReports(options: Partial<Report>): Promise<Report[]>;
-  getReports(options: Partial<Report> & IPaginationOptions): Promise<Report[]>;
-  getReports(options: Partial<Report> & IPaginationOptions): Promise<Report[]> {
-    const reportFilters = omitBy(
-      options,
-      (el) =>
-        ['page', 'perPage', 'limit'].includes(el?.toString()) || isEmpty(el),
-    );
+  async getReports(options: Partial<Report>): Promise<Report[]>;
+  async getReports(
+    options: Partial<Report>,
+    paginationOptions: IPaginationOptions,
+  ): Promise<{ results: Report[]; count: number }>;
+  async getReports(
+    options: Partial<Report>,
+    paginationOptions?: IPaginationOptions,
+  ): Promise<Report[] | { results: Report[]; count: number }> {
+    let results: Report[];
+    let count: number;
+    const filters: FindManyOptions<Report> = { where: options };
+    const query: FindManyOptions<Report> = { ...filters, ...paginationOptions };
 
-    const queryParams: FindManyOptions<Report> = { where: reportFilters };
+    console.log(query);
+    results = await this.reportRepository.find(query);
 
-    if (options.limit) {
-      queryParams.take = options.limit;
+    if (paginationOptions) {
+      count = await this.reportRepository.count(filters);
+      return { results, count };
     }
 
-    if (options.page && options.perPage) {
-      queryParams.skip = options.page * options.perPage;
-    }
-
-    return this.reportRepository.find(queryParams);
+    return results;
   }
 
   async getEstimate(
