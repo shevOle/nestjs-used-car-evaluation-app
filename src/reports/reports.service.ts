@@ -68,7 +68,6 @@ export class ReportsService {
     const filters: FindManyOptions<Report> = { where: options };
     const query: FindManyOptions<Report> = { ...filters, ...paginationOptions };
 
-    console.log(query);
     results = await this.reportRepository.find(query);
 
     if (paginationOptions) {
