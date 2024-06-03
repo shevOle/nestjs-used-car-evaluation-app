@@ -8,7 +8,7 @@ import { FindManyOptions, Repository } from 'typeorm';
 import { omitBy, isEmpty } from 'lodash';
 import { CreateReportRequestDto } from './dtos/create-report.request.dto';
 import { GetEstimateRequestDto } from './dtos/get-estimate.request.dto';
-import { Report } from '../db/entities/report.entity';
+import { Report, ReportStatuses } from '../db/entities/report.entity';
 import { User } from '../db/entities/user.entity';
 
 interface IPaginationOptions {
@@ -143,7 +143,7 @@ export class ReportsService {
   async checkReport(
     _id: number,
     currentser: User,
-    appproved: boolean,
+    status: ReportStatuses,
   ): Promise<Report> {
     const id = Number(_id);
     if (!id) throw new BadRequestException('Id is required');
@@ -152,7 +152,7 @@ export class ReportsService {
     if (!report) throw new NotFoundException('Report not found');
 
     report.updatedByUserId = currentser.id;
-    report.status = appproved ? 'approved' : 'rejected';
+    report.status = status;
     return this.reportRepository.save(report);
   }
 }

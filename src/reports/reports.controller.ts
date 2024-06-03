@@ -85,7 +85,7 @@ export class ReportsController {
     @Body() body: CheckReportRequestDto,
     @Res() res: IResponse,
   ) {
-    await this.reportService.checkReport(id, user, body.approved);
+    await this.reportService.checkReport(id, user, body.status);
     return res.sendStatus(200);
   }
 }
