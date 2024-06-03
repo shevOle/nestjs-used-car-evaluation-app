@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean } from 'class-validator';
 
-export class CheckReportRquestDto {
+export class CheckReportRequestDto {
   @ApiProperty({
     description: 'Identifies if a report is approved or rejected',
   })

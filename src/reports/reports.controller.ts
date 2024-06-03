@@ -14,7 +14,7 @@ import { Response as IResponse } from 'express';
 import { omit } from 'lodash';
 import { ReportsService } from './reports.service';
 import { CreateReportRequestDto } from './dtos/create-report.request.dto';
-import { CheckReportRquestDto } from './dtos/check-report.request.dto';
+import { CheckReportRequestDto } from './dtos/check-report.request.dto';
 import { GetEstimateRequestDto } from './dtos/get-estimate.request.dto';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -82,7 +82,7 @@ export class ReportsController {
   async checkReport(
     @CurrentUser() user: User,
     @Param('id') id: number,
-    @Body() body: CheckReportRquestDto,
+    @Body() body: CheckReportRequestDto,
     @Res() res: IResponse,
   ) {
     await this.reportService.checkReport(id, user, body.approved);
